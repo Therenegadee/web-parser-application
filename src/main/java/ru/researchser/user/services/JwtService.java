@@ -1,10 +1,11 @@
-package ru.researchser.user;
+package ru.researchser.user.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -36,23 +37,36 @@ public class JwtService {
                 .getBody();
     }
 
+    public String generateToken (UserDetails userDetails){
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    private String generateToken (Map<String, Object> claims, UserDetails userDetails){
+        return Jwts
+                .builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String generateToken (User user){
-        return generateToken(new HashMap<>(), user);
+    public boolean isTokenValid(String jwToken, UserDetails userDetails) {
+        final String userEmail = extractUserEmail(jwToken);
+        return (userEmail.equals(userDetails.getUsername())) && !isTokenExpired(jwToken);
     }
 
-    private String generateToken (Map<String, Object> claims, User user){
-        return Jwts
-                .builder()
-                .setClaims(claims)
-                .setSubject(user.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+    private boolean isTokenExpired(String jwToken) {
+        return extractExpiration(jwToken).before(new Date());
+    }
+
+    private Date extractExpiration(String jwToken) {
+        return extractClaim(jwToken, Claims::getExpiration);
     }
 }

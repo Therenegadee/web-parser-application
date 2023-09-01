@@ -10,7 +10,7 @@ spring:
     username: postgres
   jpa:
     hibernate:
-      ddl-auto: create-drop // посмотреть как пофиксить
+      ddl-auto: create-drop
     show_sql: true
     properties:
         hibernate:

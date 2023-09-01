@@ -1,9 +1,9 @@
-package ru.researchser.user;
+package ru.researchser.user.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.researchser.user.User;
+import ru.researchser.user.models.userModels.User;
 
 import java.util.Optional;
 

@@ -1,11 +1,11 @@
-package ru.researchser.user;
+package ru.researchser.user.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.researchser.user.UserRepository;
+import ru.researchser.user.repositories.UserRepository;
 
 @Service
 @AllArgsConstructor
