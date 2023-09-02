@@ -7,17 +7,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
 @Component
-public class CsvExporter {
+public class CsvFile implements ExportAlgorithm {
 
-    public void exportCSV(List<String> header, List<List<String>> allPagesParseResult) {
-        Scanner scanner = new Scanner(System.in);
+    @Override
+    public void exportData(List<String> header, List<List<String>> allPagesParseResult, String pathToOutput) {
         FileWriter outputFile = null;
         do {
             System.out.println("Введите путь к сохранению файла: ");
-            String pathToOutput = scanner.nextLine();
             File file = new File(pathToOutput);
             try {
                 outputFile = new FileWriter(file);

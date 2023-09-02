@@ -8,16 +8,17 @@ import ru.researchser.parserApplication.ParserApplication;
 @RequiredArgsConstructor
 public class ParserApplicationController {
     private final ParserApplication parserApplication;
+    private final UserParseSetting userParseSetting;
 
     @GetMapping("/parser/start-parse")
     public String runParser() {
-        parserApplication.runParser();
-        return "Parser executed!";
+        parserApplication.runParser(userParseSetting);
+        return "redirect:/api/parser/wait-for-result";
     }
 
-    @PostMapping("/parser/settings-for-parsing")
-    public String setParserSettings(@RequestBody ParseSetting parseSetting) {
-
+    @PostMapping("/parser/set-settings")
+    public String setParserSettings(@RequestBody UserParseSetting userParseSetting) {
+        return "redirect:/api/parser/start-parse";
     }
 
 }

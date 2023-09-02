@@ -1,5 +1,6 @@
 package ru.researchser.parserApplication.models.settingsForParsing;
 
+import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -8,42 +9,26 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.researchser.parserApplication.controllers.UserParseSetting;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 @Component
+@RequiredArgsConstructor
 public class LinksExtractor {
 
     private final Paginator paginator;
-    private static final Scanner SCANNER = new Scanner(System.in);
 
-    @Autowired
-    public LinksExtractor(Paginator paginator) {
-        this.paginator = paginator;
-    }
-
-    public List<String> getPagesToParseLinks(WebDriver driver) {
+    public List<String> getPagesToParseLinks(WebDriver driver, UserParseSetting userParseSetting) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
-        System.out.println("Введите кол-во страниц, которые необходимо спарсить: ");
-        int numOfPagesToParse = SCANNER.nextInt();
-        SCANNER.nextLine();
-        List<String> linksToPagesForParse = extractPagesList(driver, wait, numOfPagesToParse);
+        int numOfPagesToParse = userParseSetting.getNumOfPagesToParse();
+        List<String> linksToPagesForParse = new ArrayList<>();
         System.out.println(linksToPagesForParse);
         System.out.println("Собрали все ссылки.");
-        return linksToPagesForParse;
-    }
-
-    private List<String> extractPagesList(WebDriver driver, WebDriverWait wait, int numOfPagesToParse) {
-        List<String> linksToPagesForParse = new ArrayList<>();
-        System.out.println("Необходимо ввести название класса и тэга, " +
-                "по которому парсер будет получать ссылки на элементы страницы");
-        System.out.println("Введите название класса: ");
-        String className = SCANNER.nextLine(); // pc_ga_pro_index_17
-        System.out.println("Введите название тега: ");
-        String tagName = SCANNER.nextLine(); // a
+        String className = userParseSetting.getClassName(); // pc_ga_pro_index_17
+        String tagName = userParseSetting.getTagName(); // a
         if (numOfPagesToParse <= 0) {
             System.err.println("Неверный ввод. Введите число в диапазоне от 1 до n");
         } else if (numOfPagesToParse == 1) {
@@ -62,7 +47,7 @@ public class LinksExtractor {
             }
         } else if (numOfPagesToParse > 1) {
             System.out.println("Введите CSS Selector путь кнопки переключения следующей страницы: ");
-            String cssSelectorNextPage = SCANNER.nextLine(); // body > div > div.pro_field > div > div > a.next
+            String cssSelectorNextPage = userParseSetting.getCssSelectorNextPage(); // body > div > div.pro_field > div > div > a.next
             for (int i = 1; i <= numOfPagesToParse; i++) {
                 System.out.printf("Собираем ссылки со страницы %d...", i);
                 System.out.println();

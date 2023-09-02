@@ -1,31 +1,28 @@
-package ru.researchser.parserApplication.models.htmlElementParser;
+package ru.researchser.parserApplication.models.elementLocator;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.AbstractParseAlgorithm;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.AbstractParseParameter;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.TwoParseParameters;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseAlgorithm;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseParameter;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.TwoParseParameters;
 
 import java.time.Duration;
 
-@Component
-public class TagAttrParser implements AbstractParseAlgorithm {
-
+@Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
+public class TagAttrElement extends ElementLocator implements ParseAlgorithm {
     private final WebDriver driver;
-
-    @Autowired
-    public TagAttrParser (WebDriver driver) {
-        this.driver = driver;
-    }
-
+    private String attributeName;
 
     @Override
-    public String parseByParameters(AbstractParseParameter abstractParseParameter, String url) {
+    public String parseByParameters(ParseParameter abstractParseParameter, String url) {
         TwoParseParameters twoParseParameters = (TwoParseParameters) abstractParseParameter;
         String tagName = twoParseParameters.getParameter1();
         String attributeName = twoParseParameters.getParameter2();

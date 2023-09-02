@@ -1,30 +1,28 @@
-package ru.researchser.parserApplication.models.htmlElementParser;
+package ru.researchser.parserApplication.models.elementLocator;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.AbstractParseAlgorithm;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.AbstractParseParameter;
-import ru.researchser.parserApplication.models.htmlElementParser.DTOs.OneParseParameter;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseAlgorithm;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseParameter;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.OneParseParameter;
 
 import java.time.Duration;
 
-@Component
-public class XPathParser implements AbstractParseAlgorithm {
+@Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
+public class XPathElement extends ElementLocator implements ParseAlgorithm {
 
     private final WebDriver driver;
 
-    @Autowired
-    public XPathParser(WebDriver driver) {
-        this.driver = driver;
-    }
-
     @Override
-    public String parseByParameters(AbstractParseParameter abstractParseParameter, String url) {
+    public String parseByParameters(ParseParameter abstractParseParameter, String url) {
         String xPath = ((OneParseParameter)abstractParseParameter).getParameter();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10L));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xPath)));
@@ -37,4 +35,5 @@ public class XPathParser implements AbstractParseAlgorithm {
         String elementValue = element.getText();
         return elementValue;
     }
+
 }

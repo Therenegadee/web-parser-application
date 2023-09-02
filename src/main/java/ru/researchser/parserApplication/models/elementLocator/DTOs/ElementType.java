@@ -1,4 +1,4 @@
-package ru.researchser.parserApplication.models.htmlElementParser.DTOs;
+package ru.researchser.parserApplication.models.elementLocator.DTOs;
 
 import ru.researchser.parserApplication.configs.ParserApplicationContextConfiguration;
 

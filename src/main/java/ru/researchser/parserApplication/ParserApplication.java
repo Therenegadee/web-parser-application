@@ -1,56 +1,55 @@
 package ru.researchser.parserApplication;
 
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
+import org.openqa.selenium.WebDriver;
 import org.springframework.stereotype.Component;
 import ru.researchser.parserApplication.configs.ParserApplicationContextConfiguration;
-import ru.researchser.parserApplication.models.dataExporter.CsvExporter;
-import ru.researchser.parserApplication.models.dataExporter.ExcelExporter;
+import ru.researchser.parserApplication.controllers.UserParseSetting;
+import ru.researchser.parserApplication.models.dataExporter.OutputFile;
+import ru.researchser.parserApplication.models.elementLocator.ElementLocator;
+import ru.researchser.parserApplication.models.elementLocator.ParseElement;
 import ru.researchser.parserApplication.models.settingsForParsing.LinksExtractor;
-import ru.researchser.parserApplication.settingsForParsing.*;
-import ru.researchser.parserApplication.models.htmlElementParser.ParseElement;
-
-import org.openqa.selenium.WebDriver;
 import ru.researchser.parserApplication.services.ParserService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 @Component
-@Import(ParserApplicationContextConfiguration.class)
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class ParserApplication {
 
+    private ParserApplicationContextConfiguration configuration;
     private WebDriver driver;
     private LinksExtractor linksExtractor;
-    private ExcelExporter excelExporter;
-    private CsvExporter csvExporter;
     private ParserService parserService;
-    private ParseElement parseElement;
 
-
-    private static final Scanner SCANNER = new Scanner(System.in);
+    private final List<ParseElement> parsingTypes = new ArrayList<>();
     private final List<List<String>> allPagesParseResult = new ArrayList<>();
-    private final List<String> header = new ArrayList<>();
 
-    public void runParser() {
-        List<String> linksToPagesForParse;
-        List<ParseElement> parsingTypes;
+    @PostConstruct
+    private void initWebDriver() {
+        if (driver == null) {
+            driver = configuration.webDriver();
+        }
+    }
 
-        System.out.println("Введите ссылку на каталог страниц, которые нужно спарсить");
-        String firstPageURL = SCANNER.nextLine(); // https://zhongchou.modian.com/all/top_comment/all/1
+    public void runParser(UserParseSetting userParseSetting) {
+        initWebDriver();
+
+        String firstPageURL = userParseSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
 
-        linksToPagesForParse = linksExtractor.getPagesToParseLinks(driver);
+        for (ElementLocator e : userParseSetting.getParseSetting()) {
+            parsingTypes.add(configuration.parseElement(e, driver));
+        }
 
-        parsingTypes = parseElement.addElementsToParse(driver, header);
+        List<String> linksToPagesForParse = linksExtractor.getPagesToParseLinks(driver, userParseSetting);
 
-
-        int parsePageNumber = 0;
+        int parsePageNumber = 1;
         for (String link : linksToPagesForParse) {
-            parsePageNumber++;
             System.out.printf("Парсим информацию со сыылки № %d", parsePageNumber);
             System.out.println();
             driver.get(link);
@@ -60,23 +59,13 @@ public class ParserApplication {
             }
             allPagesParseResult.add(pageParseResult);
             parserService.saveParsingResult(pageParseResult, link);
+            parsePageNumber++;
         }
         System.out.println("Парсинг закончен.");
 
-        boolean outputFormatNotChosen = true;
-        while (outputFormatNotChosen) {
-            System.out.println("Введите формат файла вывода: xlsx или csv: ");
-            String chooseOutputFormat = SCANNER.next();
-            if (chooseOutputFormat.equalsIgnoreCase("xlsx")) {
-                outputFormatNotChosen = false;
-                excelExporter.exportXlsx(header, allPagesParseResult);
-            } else if (chooseOutputFormat.equalsIgnoreCase("csv")) {
-                outputFormatNotChosen = false;
-                csvExporter.exportCSV(header, allPagesParseResult);
-            } else {
-                System.err.println("Неверно введен формат.");
-            }
-        }
+        OutputFile outputFile = new OutputFile(userParseSetting.getOutputFileType());
+        outputFile.exportData(userParseSetting.getHeader(), allPagesParseResult, userParseSetting.getPathToOutput());
+
         driver.quit();
     }
 }

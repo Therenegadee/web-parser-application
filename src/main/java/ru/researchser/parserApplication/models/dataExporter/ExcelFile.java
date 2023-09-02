@@ -9,14 +9,12 @@ import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
 @Component
-public class ExcelExporter {
+public class ExcelFile implements ExportAlgorithm{
 
-    private final Scanner SCANNER = new Scanner(System.in);
-
-    public void exportXlsx (List<String> header, List<List<String>> allPagesParseResult) {
+    @Override
+    public void exportData (List<String> header, List<List<String>> allPagesParseResult, String pathToOutput) {
         XSSFWorkbook excelFile = new XSSFWorkbook();
         XSSFSheet spreadsheet = excelFile.createSheet("Researchser");
         fillHeader(spreadsheet, header);
@@ -27,7 +25,7 @@ public class ExcelExporter {
             System.out.printf("Wrote %s row%n", rowNum);
             rowNum++;
         }
-        saveXlsx(excelFile);
+        saveXlsx(excelFile, pathToOutput);
     }
 
     private void fillRowWithData (List<String> infoList, XSSFRow row) {
@@ -47,17 +45,13 @@ public class ExcelExporter {
         System.out.println("Header filled.");
 
     }
-    private void saveXlsx(XSSFWorkbook excelFile) {
-        do {
-            System.out.println("Введите путь к куда сохранить файл: ");
-            String pathToOutput = SCANNER.nextLine();
-            try (FileOutputStream outputFile = new FileOutputStream((pathToOutput))) {
-                excelFile.write(outputFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Неверный путь к файлу");
-            }
-        } while (false);
+    private void saveXlsx(XSSFWorkbook excelFile, String pathToOutput) {
+        try (FileOutputStream outputFile = new FileOutputStream((pathToOutput))) {
+            excelFile.write(outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Неверный путь к файлу");
+        }
     }
 
 }
