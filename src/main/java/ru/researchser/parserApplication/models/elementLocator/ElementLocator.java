@@ -2,17 +2,15 @@ package ru.researchser.parserApplication.models.elementLocator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Inheritance;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
-import java.util.UUID;
-
 import static jakarta.persistence.InheritanceType.JOINED;
 
 @Data
-@Entity
 @Inheritance(strategy = JOINED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
@@ -22,6 +20,7 @@ import static jakarta.persistence.InheritanceType.JOINED;
 })
 public abstract class ElementLocator {
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String pathToLocator;
 }

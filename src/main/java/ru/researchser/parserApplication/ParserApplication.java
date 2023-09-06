@@ -1,13 +1,13 @@
 package ru.researchser.parserApplication;
 
-import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.researchser.parserApplication.configs.ParserApplicationContextConfiguration;
-import ru.researchser.parserApplication.controllers.UserParseSetting;
-import ru.researchser.parserApplication.models.dataExporter.OutputFile;
+import ru.researchser.parserApplication.models.elementLocator.UserParseSetting;
+import ru.researchser.parserApplication.models.outputFile.OutputFile;
 import ru.researchser.parserApplication.models.elementLocator.ElementLocator;
 import ru.researchser.parserApplication.models.elementLocator.ParseElement;
 import ru.researchser.parserApplication.models.settingsForParsing.LinksExtractor;
@@ -15,29 +15,25 @@ import ru.researchser.parserApplication.services.ParserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class ParserApplication {
 
+    @Autowired
     private ParserApplicationContextConfiguration configuration;
-    private WebDriver driver;
+    @Autowired
+    private ChromeOptions chromeOptions;
+    @Autowired
     private LinksExtractor linksExtractor;
+    @Autowired
     private ParserService parserService;
 
     private final List<ParseElement> parsingTypes = new ArrayList<>();
     private final List<List<String>> allPagesParseResult = new ArrayList<>();
 
-    @PostConstruct
-    private void initWebDriver() {
-        if (driver == null) {
-            driver = configuration.webDriver();
-        }
-    }
-
-    public void runParser(UserParseSetting userParseSetting) {
-        initWebDriver();
+    public String runParser(UserParseSetting userParseSetting) {
+        WebDriver driver = new ChromeDriver(configuration.chromeOptions());
 
         String firstPageURL = userParseSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
@@ -62,10 +58,11 @@ public class ParserApplication {
             parsePageNumber++;
         }
         System.out.println("Парсинг закончен.");
+        driver.quit();
 
         OutputFile outputFile = new OutputFile(userParseSetting.getOutputFileType());
-        outputFile.exportData(userParseSetting.getHeader(), allPagesParseResult, userParseSetting.getPathToOutput());
-
-        driver.quit();
+        String outPutFilePath = UUID.randomUUID().toString().concat("file");
+        outputFile.exportData(userParseSetting.getHeader(), allPagesParseResult, outPutFilePath);
+        return outPutFilePath;
     }
 }

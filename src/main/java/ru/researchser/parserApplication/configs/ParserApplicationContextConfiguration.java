@@ -1,7 +1,9 @@
 package ru.researchser.parserApplication.configs;
 
+import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
@@ -17,7 +19,7 @@ import java.util.List;
 
 
 @Configuration
-@ConfigurationProperties("classpath:application.properties")
+@ConfigurationProperties("application.properties")
 public class ParserApplicationContextConfiguration {
     @Value("${webdriver.http.factory}")
     private String webDriverHttpFactory;
@@ -25,10 +27,10 @@ public class ParserApplicationContextConfiguration {
     private String webDriverChromeDriver;
 
     @Bean
-    public WebDriver webDriver() {
+    public ChromeOptions chromeOptions() {
         System.setProperty("webdriver.http.factory", webDriverHttpFactory);
         System.setProperty("webdriver.chrome.driver", webDriverChromeDriver);
-        return new ChromeDriver();
+        return new ChromeOptions();
     }
 
     @Bean

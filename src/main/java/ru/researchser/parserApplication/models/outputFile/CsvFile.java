@@ -1,4 +1,4 @@
-package ru.researchser.parserApplication.models.dataExporter;
+package ru.researchser.parserApplication.models.outputFile;
 
 import com.opencsv.CSVWriter;
 import org.springframework.stereotype.Component;

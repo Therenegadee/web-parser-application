@@ -1,6 +1,5 @@
-package ru.researchser.parserApplication.models.dataExporter;
+package ru.researchser.parserApplication.models.outputFile;
 
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -12,6 +11,7 @@ public class OutputFile {
     private OutputFileType type;
 
     public OutputFile(OutputFileType type) {
+        this.type=type;
         this.exportAlgorithm = switch (type){
             case XLSX -> new ExcelFile();
             case CSV -> new CsvFile();

@@ -1,4 +1,4 @@
-package ru.researchser.parserApplication.models.dataExporter;
+package ru.researchser.parserApplication.models.outputFile;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;

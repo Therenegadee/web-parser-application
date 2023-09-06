@@ -3,11 +3,13 @@ package ru.researchser.parserApplication.models.elementLocator;
 import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseAlgorithm;
 import ru.researchser.parserApplication.models.elementLocator.DTOs.ParseParameter;
 import ru.researchser.parserApplication.models.elementLocator.DTOs.OneParseParameter;
@@ -15,9 +17,10 @@ import ru.researchser.parserApplication.models.elementLocator.DTOs.OneParseParam
 import java.time.Duration;
 
 @Data
-@Entity
 @EqualsAndHashCode(callSuper = true)
+@RequiredArgsConstructor
 public class CssSelectorElement extends ElementLocator implements ParseAlgorithm {
+    @Autowired
     private final WebDriver driver;
 
     @Override
