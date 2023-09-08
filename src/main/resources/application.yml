@@ -6,12 +6,12 @@ server:
 
 spring:
   datasource:
-    password: DBPASS
+    password: parserDataBase
     url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
+    username: user
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show_sql: true
     properties:
         hibernate:

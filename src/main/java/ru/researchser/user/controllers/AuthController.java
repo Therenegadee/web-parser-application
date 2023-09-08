@@ -16,7 +16,7 @@ import ru.researchser.user.security.payloads.request.LoginRequest;
 import ru.researchser.user.security.payloads.request.SignupRequest;
 import ru.researchser.user.security.payloads.response.JwtResponse;
 import ru.researchser.user.security.payloads.response.MessageResponse;
-import ru.researchser.user.security.UserDetailsImpl;
+import ru.researchser.user.models.UserDetailsImpl;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
 import ru.researchser.user.utils.JwtUtils;

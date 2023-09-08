@@ -1,8 +1,6 @@
 package ru.researchser.parserApplication.configs;
 
-import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,7 +18,7 @@ import java.util.List;
 
 @Configuration
 @ConfigurationProperties("application.properties")
-public class ParserApplicationContextConfiguration {
+public class ParserApplicationConfiguration {
     @Value("${webdriver.http.factory}")
     private String webDriverHttpFactory;
     @Value("${webdriver.chrome.driver}")

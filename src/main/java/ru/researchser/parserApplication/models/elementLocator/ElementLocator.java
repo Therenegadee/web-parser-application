@@ -2,15 +2,16 @@ package ru.researchser.parserApplication.models.elementLocator;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Inheritance;
+import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import ru.researchser.parserApplication.models.elementLocator.DTOs.ElementType;
+import ru.researchser.parserApplication.models.settingsForParsing.UserParseSetting;
 
 import static jakarta.persistence.InheritanceType.JOINED;
 
 @Data
+@Entity
+@Table(name = "ElementLocator")
 @Inheritance(strategy = JOINED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
@@ -20,7 +21,10 @@ import static jakarta.persistence.InheritanceType.JOINED;
 })
 public abstract class ElementLocator {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private ElementType type;
     private String pathToLocator;
+    @ManyToOne
+    private UserParseSetting userParseSetting;
 }

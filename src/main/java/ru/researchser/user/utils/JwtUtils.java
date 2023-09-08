@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ru.researchser.user.security.UserDetailsImpl;
+import ru.researchser.user.models.UserDetailsImpl;
 
 import java.security.Key;
 import java.util.Date;

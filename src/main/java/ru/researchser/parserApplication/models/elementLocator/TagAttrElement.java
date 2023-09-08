@@ -1,9 +1,6 @@
 package ru.researchser.parserApplication.models.elementLocator;
 
-import jakarta.persistence.Entity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,11 +15,16 @@ import java.time.Duration;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class TagAttrElement extends ElementLocator implements ParseAlgorithm {
     @Autowired
-    private final WebDriver driver;
+    private WebDriver driver;
     private String attributeName;
+
+    public TagAttrElement(WebDriver driver) {
+        this.driver=driver;
+    }
 
     @Override
     public String parseByParameters(ParseParameter abstractParseParameter, String url) {

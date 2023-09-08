@@ -5,8 +5,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.researchser.parserApplication.configs.ParserApplicationContextConfiguration;
-import ru.researchser.parserApplication.models.elementLocator.UserParseSetting;
+import ru.researchser.parserApplication.configs.ParserApplicationConfiguration;
+import ru.researchser.parserApplication.models.settingsForParsing.UserParseSetting;
 import ru.researchser.parserApplication.models.outputFile.OutputFile;
 import ru.researchser.parserApplication.models.elementLocator.ElementLocator;
 import ru.researchser.parserApplication.models.elementLocator.ParseElement;
@@ -21,7 +21,7 @@ import java.util.UUID;
 public class ParserApplication {
 
     @Autowired
-    private ParserApplicationContextConfiguration configuration;
+    private ParserApplicationConfiguration configuration;
     @Autowired
     private ChromeOptions chromeOptions;
     @Autowired
