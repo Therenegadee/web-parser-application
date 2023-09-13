@@ -134,6 +134,11 @@
 			<artifactId>telegrambots</artifactId>
 			<version>5.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hashids</groupId>
+			<artifactId>hashids</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

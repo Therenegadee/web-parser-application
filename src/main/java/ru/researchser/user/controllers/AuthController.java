@@ -2,16 +2,21 @@ package ru.researchser.user.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.researchser.user.models.ERole;
+import ru.researchser.mailSender.MailSenderService;
+import ru.researchser.mailSender.SendMailRequest;
+import ru.researchser.user.models.enums.ERole;
 import ru.researchser.user.models.Role;
 import ru.researchser.user.models.User;
+import ru.researchser.user.models.enums.UserStatus;
 import ru.researchser.user.security.payloads.request.LoginRequest;
 import ru.researchser.user.security.payloads.request.SignupRequest;
 import ru.researchser.user.security.payloads.response.JwtResponse;
@@ -19,10 +24,12 @@ import ru.researchser.user.security.payloads.response.MessageResponse;
 import ru.researchser.user.models.UserDetailsImpl;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
+import ru.researchser.utils.CryptoUtil;
 import ru.researchser.utils.JwtUtils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,12 +37,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Log4j
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
+    private final MailSenderService senderService;
+    private final CryptoUtil cryptoUtil;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -76,6 +86,18 @@ public class AuthController {
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
+        user.setUserStatus(UserStatus.WAIT_FOR_EMAIL_VERIFICATION);
+
+        String cryptoUserId = cryptoUtil.hashOf(user.getId());
+
+        SendMailRequest sendMailRequest = new SendMailRequest()
+                .builder()
+                .cryptoUserId(cryptoUserId)
+                .userEmail(user.getEmail())
+                .build();
+
+        senderService.sendVerificationEmail(sendMailRequest);
+
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
@@ -103,6 +125,31 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(
+                new MessageResponse("User registered successfully and waits for email verification!"));
     }
+
+    @GetMapping("/activation?id={id}")
+    public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
+        Long userId = cryptoUtil.idOf(cryptoUserId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isEmpty()) {
+            User user = userOptional.get();
+            if (user.getUserStatus().equals(UserStatus.WAIT_FOR_EMAIL_VERIFICATION)) {
+                user.setUserStatus(UserStatus.CONFIRMED_ACCOUNT);
+                return ResponseEntity
+                        .ok(new MessageResponse("Account confirmed successfully"));
+            } else if (user.getUserStatus().equals(UserStatus.CONFIRMED_ACCOUNT)) {
+                log.debug("Account is already confirmed!");
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Account is already confirmed!"));
+            }
+        }
+        log.debug("User with user id not found. Link isn't valid");
+        return ResponseEntity
+                .unprocessableEntity()
+                .body(new MessageResponse("The link isn't valid"));
+    }
+
 }

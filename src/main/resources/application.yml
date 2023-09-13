@@ -4,25 +4,6 @@ server:
     include-message: always
     include-binding-errors: always
 
-researchser:
-  jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
-  jwtExpirationMs: 86400000
-
-service:
-  activation:
-    uri: http://localhost:8080/api/user/activation?id={id}
-  mail:
-    uri: http://localhost:8080/api/mail/send
-
-webdriver:
-  http:
-    factory: jdk-http-client
-  chrome:
-    driver: src/main/resources/driver/chrome/chromedriver_macOS
-#    For Windows (32)
-# webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_windows32.exe
-#    For Linux (64)
-# webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_linux64
 spring:
   datasource:
     password: parserDataBase
@@ -49,3 +30,23 @@ spring:
     username: admin
     password: adminPassword
 
+# noinspection undefined
+webdriver:
+  http:
+    factory: jdk-http-client
+  chrome:
+    driver: src/main/resources/driver/chrome/chromedriver_macOS
+  #    For Windows (32)
+  # webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_windows32.exe
+  #    For Linux (64)
+  # webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_linux64
+
+# noinspection undefined
+researchser:
+  jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
+  jwtExpirationMs: 86400000
+
+# noinspection undefined
+service:
+  activation:
+    uri: http://localhost:8080/api/auth/activation?id={id}

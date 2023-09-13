@@ -1,4 +1,4 @@
-package ru.researchser.user.models;
+package ru.researchser.user.models.enums;
 
 public enum ERole {
     ROLE_USER,

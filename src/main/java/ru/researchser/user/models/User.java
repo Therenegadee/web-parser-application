@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import ru.researchser.parser.models.UserParseSetting;
+import ru.researchser.user.models.enums.UserStatus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +44,9 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
 
     @OneToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "user_parse_settings_id")

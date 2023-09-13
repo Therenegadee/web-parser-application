@@ -21,4 +21,11 @@ public class UserDetailsService implements org.springframework.security.core.use
                 .orElseThrow(() -> new UsernameNotFoundException("User with username: %s Not Found" + username));
         return UserDetailsImpl.build(user);
     }
+
+    @Transactional
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with email: %s Not Found" + email));
+        return UserDetailsImpl.build(user);
+    }
 }

@@ -2,6 +2,7 @@ package ru.researchser.user.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import ru.researchser.user.models.enums.ERole;
 
 @Entity
 @Table(name = "roles")
