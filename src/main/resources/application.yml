@@ -4,6 +4,25 @@ server:
     include-message: always
     include-binding-errors: always
 
+researchser:
+  jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
+  jwtExpirationMs: 86400000
+
+service:
+  activation:
+    uri: http://localhost:8080/api/user/activation?id={id}
+  mail:
+    uri: http://localhost:8080/api/mail/send
+
+webdriver:
+  http:
+    factory: jdk-http-client
+  chrome:
+    driver: src/main/resources/driver/chrome/chromedriver_macOS
+#    For Windows (32)
+# webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_windows32.exe
+#    For Linux (64)
+# webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_linux64
 spring:
   datasource:
     password: parserDataBase
@@ -14,7 +33,19 @@ spring:
       ddl-auto: update
     show_sql: true
     properties:
-        hibernate:
-        format_sql: true
-        database: postgresql
-        database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+      hibernate:
+      format_sql: true
+      database: postgresql
+      database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+  mail:
+    host: smtp.yandex.ru
+    port: 8085
+    protocol: smtps
+    username: uparse.confirmation@yandex.ru
+    password: 1234567890ABC
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: adminPassword
+

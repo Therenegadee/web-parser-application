@@ -1,4 +1,4 @@
-package ru.researchser.user.utils;
+package ru.researchser.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

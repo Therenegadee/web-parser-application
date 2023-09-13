@@ -19,7 +19,7 @@ import ru.researchser.user.security.payloads.response.MessageResponse;
 import ru.researchser.user.models.UserDetailsImpl;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
-import ru.researchser.user.utils.JwtUtils;
+import ru.researchser.utils.JwtUtils;
 
 import java.util.HashSet;
 import java.util.List;
