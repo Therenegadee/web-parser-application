@@ -19,17 +19,17 @@ spring:
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQL95Dialect
   mail:
-    host: smtp.yandex.ru
-    port: 8085
+    host: smtp.gmail.com
+    port: 465
     protocol: smtps
     username: uparse.confirmation@yandex.ru
-    password: 1234567890ABC
+    password: jcfwyjrsjuobgqth
   rabbitmq:
     host: localhost
     port: 5672
     username: admin
     password: adminPassword
-
+#pUu-PWd-Kq6-Wqi
 # noinspection undefined
 webdriver:
   http:
@@ -50,3 +50,6 @@ researchser:
 service:
   activation:
     uri: http://localhost:8080/api/auth/activation?id={id}
+
+# noinspection undefined
+salt: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB

@@ -1,13 +1,10 @@
 package ru.researchser.utils;
 
 import org.hashids.Hashids;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CryptoUtil {
 
-    private final Hashids hashids;
+    private Hashids hashids;
 
     public CryptoUtil(String salt) {
         int minHashLength = 10;

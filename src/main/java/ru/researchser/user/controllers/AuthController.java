@@ -8,7 +8,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mailSender.MailSenderService;
@@ -88,16 +87,6 @@ public class AuthController {
 
         user.setUserStatus(UserStatus.WAIT_FOR_EMAIL_VERIFICATION);
 
-        String cryptoUserId = cryptoUtil.hashOf(user.getId());
-
-        SendMailRequest sendMailRequest = new SendMailRequest()
-                .builder()
-                .cryptoUserId(cryptoUserId)
-                .userEmail(user.getEmail())
-                .build();
-
-        senderService.sendVerificationEmail(sendMailRequest);
-
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
 
@@ -125,6 +114,15 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
+        String cryptoUserId = cryptoUtil.hashOf(user.getId());
+
+        SendMailRequest sendMailRequest = new SendMailRequest()
+                .builder()
+                .cryptoUserId(cryptoUserId)
+                .userEmail(user.getEmail())
+                .build();
+
+        senderService.sendVerificationEmail(sendMailRequest);
         return ResponseEntity.ok(
                 new MessageResponse("User registered successfully and waits for email verification!"));
     }

@@ -3,6 +3,7 @@ package ru.researchser.user.configs;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.researchser.user.security.AuthEntryPointJwt;
 import ru.researchser.user.security.AuthTokenFilter;
 import ru.researchser.user.services.UserDetailsService;
+import ru.researchser.utils.CryptoUtil;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,6 +29,8 @@ public class SecurityConfiguration {
     private UserDetailsService userDetailsService;
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+    @Value("${salt}")
+    private String salt;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -76,4 +80,8 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    @Bean
+    public CryptoUtil cryptoUtil(){
+        return new CryptoUtil(salt);
+    }
 }
