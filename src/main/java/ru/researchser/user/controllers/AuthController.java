@@ -127,14 +127,15 @@ public class AuthController {
                 new MessageResponse("User registered successfully and waits for email verification!"));
     }
 
-    @GetMapping("/activation?id={id}")
-    public ResponseEntity<?> activateUser(@RequestParam("{id}") String cryptoUserId) {
+    @GetMapping("/activation")
+    public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isEmpty()) {
             User user = userOptional.get();
             if (user.getUserStatus().equals(UserStatus.WAIT_FOR_EMAIL_VERIFICATION)) {
                 user.setUserStatus(UserStatus.CONFIRMED_ACCOUNT);
+                userRepository.save(user);
                 return ResponseEntity
                         .ok(new MessageResponse("Account confirmed successfully"));
             } else if (user.getUserStatus().equals(UserStatus.CONFIRMED_ACCOUNT)) {
