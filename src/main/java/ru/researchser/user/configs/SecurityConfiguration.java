@@ -67,8 +67,7 @@ public class SecurityConfiguration {
                                 (
                                         "/api/auth/**",
                                         "/api/test/**",
-                                        "/api/parser/**",
-                                        "/v3/api-docs"
+                                        "/api/parser/**"
                                 )
                         .permitAll()
                         .anyRequest()

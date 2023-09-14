@@ -27,7 +27,6 @@ public class MailSenderConfiguration {
         javaMailSender.setUsername(username);
         javaMailSender.setPassword(password);
         javaMailSender.setProtocol(protocol);
-
         return javaMailSender;
     }
 }

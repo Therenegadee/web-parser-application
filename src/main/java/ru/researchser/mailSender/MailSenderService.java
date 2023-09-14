@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class MailSenderService {
     @Autowired
     private JavaMailSender mailSender;
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.sender.email}")
     private String emailFrom;
     @Value("${service.activation.uri}")
     private String activationUri;
@@ -25,7 +25,7 @@ public class MailSenderService {
         String subject = "Email address confirmation";
         String messageBody = String.format("Для подтверждения Ваше электронной почты и " +
                         "активации аккаунта необходимо перейти по ссылке %s", activationUri);
-        messageBody = messageBody.replace("id", request.getCryptoUserId());
+        messageBody = messageBody.replace("{id}", request.getCryptoUserId());
         String emailTo = request.getUserEmail();
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();

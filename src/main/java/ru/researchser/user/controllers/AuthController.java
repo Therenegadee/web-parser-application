@@ -128,7 +128,7 @@ public class AuthController {
     }
 
     @GetMapping("/activation?id={id}")
-    public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
+    public ResponseEntity<?> activateUser(@RequestParam("{id}") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isEmpty()) {

@@ -19,11 +19,21 @@ spring:
       database: postgresql
       database-platform: org.hibernate.dialect.PostgreSQL95Dialect
   mail:
-    host: smtp.gmail.com
+    host: smtp.yandex.ru
     port: 465
     protocol: smtps
     username: uparse.confirmation@yandex.ru
     password: jcfwyjrsjuobgqth
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+    sender:
+      email: uparse.confirmation@yandex.ru
+
   rabbitmq:
     host: localhost
     port: 5672
