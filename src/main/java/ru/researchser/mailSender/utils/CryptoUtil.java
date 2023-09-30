@@ -1,4 +1,4 @@
-package ru.researchser.utils;
+package ru.researchser.mailSender.utils;
 
 import org.hashids.Hashids;
 

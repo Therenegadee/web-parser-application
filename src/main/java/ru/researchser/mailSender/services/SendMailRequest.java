@@ -1,4 +1,4 @@
-package ru.researchser.mailSender;
+package ru.researchser.mailSender.services;
 
 import lombok.*;
 import org.springframework.stereotype.Component;

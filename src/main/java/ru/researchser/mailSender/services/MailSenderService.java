@@ -1,6 +1,5 @@
-package ru.researchser.mailSender;
+package ru.researchser.mailSender.services;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

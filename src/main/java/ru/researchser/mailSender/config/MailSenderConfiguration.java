@@ -1,4 +1,4 @@
-package ru.researchser.mailSender;
+package ru.researchser.mailSender.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,30 +1,32 @@
-package ru.researchser.user.controllers;
+package ru.researchser.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.researchser.mailSender.MailSenderService;
-import ru.researchser.mailSender.SendMailRequest;
+import ru.researchser.mailSender.services.MailSenderService;
+import ru.researchser.mailSender.services.SendMailRequest;
 import ru.researchser.user.models.enums.ERole;
 import ru.researchser.user.models.Role;
 import ru.researchser.user.models.User;
 import ru.researchser.user.models.enums.UserStatus;
-import ru.researchser.user.security.payloads.request.LoginRequest;
-import ru.researchser.user.security.payloads.request.SignupRequest;
-import ru.researchser.user.security.payloads.response.JwtResponse;
-import ru.researchser.user.security.payloads.response.MessageResponse;
-import ru.researchser.user.models.UserDetailsImpl;
+import ru.researchser.security.payloads.request.LoginRequest;
+import ru.researchser.security.payloads.request.SignupRequest;
+import ru.researchser.security.payloads.response.JwtResponse;
+import ru.researchser.security.payloads.response.MessageResponse;
+import ru.researchser.security.user.UserDetailsImpl;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
-import ru.researchser.utils.CryptoUtil;
-import ru.researchser.utils.JwtUtils;
+import ru.researchser.mailSender.utils.CryptoUtil;
+import ru.researchser.security.services.JwtUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +49,7 @@ public class AuthController {
     private final CryptoUtil cryptoUtil;
 
     @PostMapping("/signin")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -57,7 +60,7 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
@@ -66,8 +69,8 @@ public class AuthController {
                 userDetails.getEmail(),
                 roles));
     }
-
     @PostMapping("/signup")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
@@ -128,6 +131,7 @@ public class AuthController {
     }
 
     @GetMapping("/activation")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);

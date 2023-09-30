@@ -1,4 +1,4 @@
-package ru.researchser.user.security.payloads.response;
+package ru.researchser.security.payloads.response;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

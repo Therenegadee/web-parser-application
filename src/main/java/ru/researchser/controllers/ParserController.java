@@ -1,4 +1,4 @@
-package ru.researchser.parser.controllers;
+package ru.researchser.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.researchser.parser.models.UserParseSetting;
 import ru.researchser.parser.services.ParserService;
 import ru.researchser.user.repositories.UserRepository;
-import ru.researchser.user.security.payloads.response.MessageResponse;
+import ru.researchser.security.payloads.response.MessageResponse;
 
 import java.io.IOException;
 import java.nio.file.Files;
