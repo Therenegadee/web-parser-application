@@ -1,9 +1,8 @@
-package ru.researchser.mailSender.utils;
+package ru.researchser.security.utils;
 
 import org.hashids.Hashids;
 
 public class CryptoUtil {
-
     private Hashids hashids;
 
     public CryptoUtil(String salt) {

@@ -15,41 +15,38 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mailSender.services.MailSenderService;
 import ru.researchser.mailSender.services.SendMailRequest;
-import ru.researchser.user.models.enums.ERole;
-import ru.researchser.user.models.Role;
-import ru.researchser.user.models.User;
-import ru.researchser.user.models.enums.UserStatus;
 import ru.researchser.security.payloads.request.LoginRequest;
 import ru.researchser.security.payloads.request.SignupRequest;
 import ru.researchser.security.payloads.response.JwtResponse;
 import ru.researchser.security.payloads.response.MessageResponse;
+import ru.researchser.security.services.JwtUtils;
 import ru.researchser.security.user.UserDetailsImpl;
+import ru.researchser.security.utils.CryptoUtil;
+import ru.researchser.user.models.Role;
+import ru.researchser.user.models.User;
+import ru.researchser.user.models.enums.ERole;
+import ru.researchser.user.models.enums.UserStatus;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
-import ru.researchser.security.utils.CryptoUtil;
-import ru.researchser.security.services.JwtUtils;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/telegram/auth")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Log4j
-public class AuthController {
+public class TelegramRequestsController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
-    @Autowired
-    private MailSenderService senderService;
-    @Autowired
-    private CryptoUtil cryptoUtil;
+
+
 
     @PostMapping("/signin")
     @PreAuthorize("isAnonymous()")
@@ -120,42 +117,7 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        String cryptoUserId = cryptoUtil.hashOf(user.getId());
-
-        SendMailRequest sendMailRequest = new SendMailRequest()
-                .builder()
-                .cryptoUserId(cryptoUserId)
-                .userEmail(user.getEmail())
-                .build();
-
-        senderService.sendVerificationEmail(sendMailRequest);
         return ResponseEntity.ok(
-                new MessageResponse("User registered successfully and waits for email verification!"));
+                new MessageResponse("User registered successfully!"));
     }
-
-    @GetMapping("/activation")
-    @PreAuthorize("isAnonymous()")
-    public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
-        Long userId = cryptoUtil.idOf(cryptoUserId);
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (!userOptional.isEmpty()) {
-            User user = userOptional.get();
-            if (user.getUserStatus().equals(UserStatus.WAIT_FOR_EMAIL_VERIFICATION)) {
-                user.setUserStatus(UserStatus.CONFIRMED_ACCOUNT);
-                userRepository.save(user);
-                return ResponseEntity
-                        .ok(new MessageResponse("Account confirmed successfully"));
-            } else if (user.getUserStatus().equals(UserStatus.CONFIRMED_ACCOUNT)) {
-                log.debug("Account is already confirmed!");
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("Account is already confirmed!"));
-            }
-        }
-        log.debug("User with user id not found. Link isn't valid");
-        return ResponseEntity
-                .unprocessableEntity()
-                .body(new MessageResponse("The link isn't valid"));
-    }
-
 }

@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @PropertySource(value = "classpath:application.yml")
-@RequiredArgsConstructor
 public class MailSenderService {
     @Autowired
     private JavaMailSender mailSender;
-    @Value("${spring.mail.sender.email}")
+    @Value("${spring.mail.username}")
     private String emailFrom;
-    @Value("${service.activation.uri}")
+    @Value("${mail-service.activation.uri}")
     private String activationUri;
 
 

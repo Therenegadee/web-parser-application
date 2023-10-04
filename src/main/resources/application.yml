@@ -29,18 +29,11 @@ spring:
       mail:
         smtp:
           auth: true
-          ssl:
-            enable: true
-    sender:
-      email: uparse.confirmation@yandex.ru
+        ssl:
+          enable: true
+        sender:
+          email: uparse.confirmation@yandex.ru
 
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: adminPassword
-
-# noinspection undefined
 webdriver:
   http:
     factory: jdk-http-client
@@ -51,15 +44,12 @@ webdriver:
   #    For Linux (64)
   # webdriver.chrome.driver=src/main/resources/driver/chrome/chromedriver_linux64
 
-# noinspection undefined
-researchser:
+jwt:
   jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
   jwtExpirationMs: 86400000
 
-# noinspection undefined
-service:
+mail-service:
   activation:
     uri: http://localhost:8080/api/auth/activation?id={id}
-
-# noinspection undefined
-salt: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB
+  crypto-util:
+    salt: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB

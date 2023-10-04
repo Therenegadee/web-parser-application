@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.researchser.security.services.AuthTokenFilter;
 import ru.researchser.security.services.AuthEntryPointJwt;
 import ru.researchser.security.user.UserDetailsService;
-import ru.researchser.mailSender.utils.CryptoUtil;
+import ru.researchser.security.utils.CryptoUtil;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     private UserDetailsService userDetailsService;
     @Autowired
     private AuthEntryPointJwt authEntryPointJwt;
-    @Value("${salt}")
+    @Value("${mail-service.crypto-util.salt}")
     private String salt;
 
     @Bean
@@ -64,7 +64,8 @@ public class SecurityConfiguration {
                                 (
                                         "/api/auth/**",
                                         "/api/test/**",
-                                        "/api/parser/**"
+                                        "/api/parser/**",
+                                        "/api/telegram/auth/**"
                                 )
                         .permitAll()
                         .anyRequest()
@@ -78,7 +79,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public CryptoUtil cryptoUtil(){
+    public CryptoUtil cryptoUtil() {
         return new CryptoUtil(salt);
     }
 }

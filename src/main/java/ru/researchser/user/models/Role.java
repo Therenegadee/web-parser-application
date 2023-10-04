@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 import ru.researchser.user.models.enums.ERole;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "roles",
+        uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Data
 @NoArgsConstructor
 public class Role {
