@@ -1,12 +1,19 @@
 package ru.researchser.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,19 +22,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mailSender.services.MailSenderService;
 import ru.researchser.mailSender.services.SendMailRequest;
-import ru.researchser.user.models.enums.ERole;
-import ru.researchser.user.models.Role;
-import ru.researchser.user.models.User;
-import ru.researchser.user.models.enums.UserStatus;
 import ru.researchser.security.payloads.request.LoginRequest;
 import ru.researchser.security.payloads.request.SignupRequest;
 import ru.researchser.security.payloads.response.JwtResponse;
 import ru.researchser.security.payloads.response.MessageResponse;
+import ru.researchser.security.services.JwtUtils;
 import ru.researchser.security.user.UserDetailsImpl;
+import ru.researchser.security.utils.CryptoUtil;
+import ru.researchser.user.models.Role;
+import ru.researchser.user.models.User;
+import ru.researchser.user.models.enums.ERole;
+import ru.researchser.user.models.enums.UserStatus;
 import ru.researchser.user.repositories.RoleRepository;
 import ru.researchser.user.repositories.UserRepository;
-import ru.researchser.security.utils.CryptoUtil;
-import ru.researchser.security.services.JwtUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +42,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+@Tag(name = "Authentication", description = "Authentication API")
 @RequiredArgsConstructor
 @Log4j
 public class AuthController {
@@ -46,95 +54,106 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
-    @Autowired
-    private MailSenderService senderService;
-    @Autowired
-    private CryptoUtil cryptoUtil;
+    private final MailSenderService senderService;
+    private final CryptoUtil cryptoUtil;
 
     @PostMapping("/signin")
     @PreAuthorize("isAnonymous()")
+    @Operation(
+            summary = "Login operation",
+            operationId = "authenticateUser"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "User logged in successfuly!", content = @Content(schema = @Schema(implementation = JwtResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Account with such email is already in use!")
+    })
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+            return ResponseEntity
+                    .ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    roles));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Authentication error! Incorrect login/password input"));
+        }
     }
+
     @PostMapping("/signup")
     @PreAuthorize("isAnonymous()")
+    @Operation(
+            summary = "Register operation",
+            operationId = "registerUser"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User registered successfully and waits for email verification!"),
+            @ApiResponse(responseCode = "400", description = "Account with such email is already in use!"),
+            @ApiResponse(responseCode = "409", description = "Account with such username is already in use!")
+    })
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+                    .status(HttpStatus.CONFLICT)
+                    .body(new MessageResponse("Account with such username is already in use!"));
         }
-
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+                    .body(new MessageResponse("Account with such email is already in use!"));
         }
-
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
         user.setUserStatus(UserStatus.WAIT_FOR_EMAIL_VERIFICATION);
 
-        Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Role is not found."));
+        roles.add(userRole);
         user.setRoles(roles);
         userRepository.save(user);
 
         String cryptoUserId = cryptoUtil.hashOf(user.getId());
-
         SendMailRequest sendMailRequest = new SendMailRequest()
                 .builder()
                 .cryptoUserId(cryptoUserId)
                 .userEmail(user.getEmail())
                 .build();
-
         senderService.sendVerificationEmail(sendMailRequest);
-        return ResponseEntity.ok(
-                new MessageResponse("User registered successfully and waits for email verification!"));
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new MessageResponse("User registered successfully and waits for email verification!"));
     }
 
-    @GetMapping("/activation")
+    @PatchMapping("/activation")
     @PreAuthorize("isAnonymous()")
+    @Operation(
+            summary = "Activation user via email operation",
+            operationId = "activateUser"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Account was confirmed successfully"),
+            @ApiResponse(responseCode = "400", description = "Account is already confirmed!"),
+            @ApiResponse(responseCode = "404", description = "The link isn't valid. User with such user id not found.")
+    })
     public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
@@ -152,10 +171,10 @@ public class AuthController {
                         .body(new MessageResponse("Account is already confirmed!"));
             }
         }
-        log.debug("User with user id not found. Link isn't valid");
+        log.debug("User with such user id not found. Link isn't valid");
         return ResponseEntity
-                .unprocessableEntity()
-                .body(new MessageResponse("The link isn't valid"));
+                .notFound()
+                .build();
     }
 
 }

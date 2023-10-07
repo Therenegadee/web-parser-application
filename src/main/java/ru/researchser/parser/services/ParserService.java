@@ -1,6 +1,7 @@
 package ru.researchser.parser.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -15,29 +16,23 @@ import ru.researchser.parser.configs.ParserConfiguration;
 import ru.researchser.parser.logic.element.ParseElement;
 import ru.researchser.parser.logic.outputFile.OutputFile;
 import ru.researchser.parser.logic.outputFile.OutputFileType;
-import ru.researchser.parser.models.ColumnValue;
 import ru.researchser.parser.models.ElementLocator;
-import ru.researchser.parser.models.ParsingResult;
 import ru.researchser.parser.models.UserParseSetting;
-import ru.researchser.parser.repositories.ParsingResultRepository;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Log4j
 public class ParserService {
-    @Autowired
-    private final ParsingResultRepository parsingResultRepository;
     @Autowired
     private final ParserConfiguration configuration;
     @Autowired
     private final ChromeOptions chromeOptions;
     private WebDriver driver;
     private final List<ParseElement> parsingTypes = new ArrayList<>();
-    private final List<List<String>> allPagesParseResult = new ArrayList<>();
+    private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
     public String runParser(UserParseSetting userParseSetting) {
         driver = new ChromeDriver(chromeOptions);
@@ -59,8 +54,7 @@ public class ParserService {
             for (ParseElement parseElement : parsingTypes) {
                 pageParseResult.add(parseElement.parseByParameters(link));
             }
-            allPagesParseResult.add(pageParseResult);
-            saveParsingResult(pageParseResult, link);
+            allPagesParseResult.put(link, pageParseResult);
             parsePageNumber++;
         }
         System.out.println("Парсинг закончен.");
@@ -69,32 +63,18 @@ public class ParserService {
         OutputFileType fileType = userParseSetting.getOutputFileType();
         StringBuilder fileNameBuilder = new StringBuilder(UUID.randomUUID().toString());
         fileNameBuilder.append("file");
+
         if(fileType == OutputFileType.XLSX) {
             fileNameBuilder.append(".xlsx");
         } else {
             fileNameBuilder.append(".csv");
         }
+
         String fileName = fileNameBuilder.toString();
-        StringBuilder outPutFilePathBuilder = new StringBuilder("src/main/resources/savedFilesDirectory/");
-        outPutFilePathBuilder.append(fileName);
-        String outPutFilePath = outPutFilePathBuilder.toString();
+        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + fileName;
         OutputFile outputFile = new OutputFile(fileType);
         outputFile.exportData(userParseSetting.getHeader(), allPagesParseResult, outPutFilePath);
         return outPutFilePath;
-    }
-
-    public void saveParsingResult(List<String> resultRow, String link) {
-        ParsingResult parsingResult = new ParsingResult();
-        List<ColumnValue> columnValues = new ArrayList<>();
-        for (int i = 0; i < resultRow.size(); i++) {
-            columnValues.add(ColumnValue.builder()
-                    .columnNumber(i)
-                    .value(resultRow.get(i))
-                    .build());
-        }
-        parsingResult.setUrl(link);
-        parsingResult.setParseResult(columnValues);
-        parsingResultRepository.save(parsingResult);
     }
     public void clickNextPageButton (String cssSelectorNextPage) {
         WebElement nextPageButton = driver.findElement(By.cssSelector(cssSelectorNextPage)); // "body > div > div.pro_field > div > div > a.next"

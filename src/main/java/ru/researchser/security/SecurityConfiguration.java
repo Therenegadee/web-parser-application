@@ -1,4 +1,4 @@
-package ru.researchser.security.config;
+package ru.researchser.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +67,10 @@ public class SecurityConfiguration {
                                         "/api/parser/**",
                                         "/api/telegram/auth/**"
                                 )
+                        .permitAll()
+                        .requestMatchers("/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

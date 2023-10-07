@@ -29,6 +29,4 @@ public class UserParseSetting {
     private List<ElementLocator> parseSetting;
     @Enumerated(EnumType.STRING)
     private OutputFileType outputFileType;
-    @OneToOne(mappedBy = "userParseSetting")
-    private User user;
 }

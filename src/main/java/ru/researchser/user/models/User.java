@@ -9,6 +9,7 @@ import ru.researchser.parser.models.UserParseSetting;
 import ru.researchser.user.models.enums.UserStatus;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -19,7 +20,8 @@ import java.util.Set;
 @Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email")
+                @UniqueConstraint(columnNames = "email"),
+                @UniqueConstraint(columnNames = "telegramUserId")
         })
 public class User {
     @Id
@@ -39,18 +41,17 @@ public class User {
     @Size(max = 120)
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @OneToMany(fetch = FetchType.LAZY)
     private Set<Role> roles = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    @OneToOne (fetch = FetchType.LAZY)
+    @OneToMany (fetch = FetchType.LAZY)
     @JoinColumn(name = "user_parse_settings_id")
-    private UserParseSetting userParseSetting;
+    private List<UserParseSetting> userParseSetting;
+
+    private String telegramUserId;
 
     public User (String username, String email, String password) {
         this.username = username;

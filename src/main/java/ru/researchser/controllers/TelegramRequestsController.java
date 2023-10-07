@@ -3,7 +3,6 @@ package ru.researchser.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,15 +12,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.researchser.mailSender.services.MailSenderService;
-import ru.researchser.mailSender.services.SendMailRequest;
 import ru.researchser.security.payloads.request.LoginRequest;
 import ru.researchser.security.payloads.request.SignupRequest;
 import ru.researchser.security.payloads.response.JwtResponse;
 import ru.researchser.security.payloads.response.MessageResponse;
 import ru.researchser.security.services.JwtUtils;
 import ru.researchser.security.user.UserDetailsImpl;
-import ru.researchser.security.utils.CryptoUtil;
 import ru.researchser.user.models.Role;
 import ru.researchser.user.models.User;
 import ru.researchser.user.models.enums.ERole;
@@ -90,30 +86,10 @@ public class TelegramRequestsController {
 
         user.setUserStatus(UserStatus.WAIT_FOR_EMAIL_VERIFICATION);
 
-        Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
-                }
-            });
-        }
-
+        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
         user.setRoles(roles);
         userRepository.save(user);
 

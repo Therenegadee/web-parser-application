@@ -2,6 +2,7 @@ package ru.researchser.parser.logic.outputFile;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -18,7 +19,7 @@ public class OutputFile {
         };
     }
 
-    public void exportData(List<String> header, List<List<String>> allPagesParseResult, String pathToOutput) {
+    public void exportData(List<String> header, HashMap<String, List<String>> allPagesParseResult, String pathToOutput) {
         exportAlgorithm.exportData(header, allPagesParseResult, pathToOutput);
     }
 }
