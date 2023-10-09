@@ -1,11 +1,5 @@
 package ru.researchser.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -22,10 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mailSender.services.MailSenderService;
 import ru.researchser.mailSender.services.SendMailRequest;
-import ru.researchser.security.payloads.request.LoginRequest;
-import ru.researchser.security.payloads.request.SignupRequest;
-import ru.researchser.security.payloads.response.JwtResponse;
-import ru.researchser.security.payloads.response.MessageResponse;
+import ru.researchser.openapi.api.AuthApiDelegate;
+import ru.researchser.openapi.model.JwtResponse;
+import ru.researchser.openapi.model.LoginRequest;
+import ru.researchser.openapi.model.MessageResponse;
+import ru.researchser.openapi.model.SignupRequest;
 import ru.researchser.security.services.JwtUtils;
 import ru.researchser.security.user.UserDetailsImpl;
 import ru.researchser.security.utils.CryptoUtil;
@@ -45,10 +40,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
-@Tag(name = "Authentication", description = "Authentication API")
 @RequiredArgsConstructor
 @Log4j
-public class AuthController {
+public class AuthController implements AuthApiDelegate {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -57,17 +51,10 @@ public class AuthController {
     private final MailSenderService senderService;
     private final CryptoUtil cryptoUtil;
 
+    @Override
     @PostMapping("/signin")
     @PreAuthorize("isAnonymous()")
-    @Operation(
-            summary = "Login operation",
-            operationId = "authenticateUser"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "User logged in successfuly!", content = @Content(schema = @Schema(implementation = JwtResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Account with such email is already in use!")
-    })
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -87,26 +74,15 @@ public class AuthController {
                     userDetails.getUsername(),
                     userDetails.getEmail(),
                     roles));
-
         } catch (BadCredentialsException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Authentication error! Incorrect login/password input"));
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
+    @Override
     @PostMapping("/signup")
     @PreAuthorize("isAnonymous()")
-    @Operation(
-            summary = "Register operation",
-            operationId = "registerUser"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "User registered successfully and waits for email verification!"),
-            @ApiResponse(responseCode = "400", description = "Account with such email is already in use!"),
-            @ApiResponse(responseCode = "409", description = "Account with such username is already in use!")
-    })
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
@@ -143,18 +119,10 @@ public class AuthController {
                 .body(new MessageResponse("User registered successfully and waits for email verification!"));
     }
 
+    @Override
     @PatchMapping("/activation")
     @PreAuthorize("isAnonymous()")
-    @Operation(
-            summary = "Activation user via email operation",
-            operationId = "activateUser"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Account was confirmed successfully"),
-            @ApiResponse(responseCode = "400", description = "Account is already confirmed!"),
-            @ApiResponse(responseCode = "404", description = "The link isn't valid. User with such user id not found.")
-    })
-    public ResponseEntity<?> activateUser(@RequestParam("id") String cryptoUserId) {
+    public ResponseEntity<MessageResponse> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isEmpty()) {

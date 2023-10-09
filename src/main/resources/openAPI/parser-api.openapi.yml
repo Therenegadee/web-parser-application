@@ -45,10 +45,22 @@ paths:
       responses:
         '201':
           description: User registered successfully and waits for email verification!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '400':
           description: Account with such email is already in use!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '409':
           description: Account with such username is already in use!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
 
   /auth/signin:
     post:
@@ -71,6 +83,10 @@ paths:
                 $ref: '#/components/schemas/JwtResponse'
         '400':
           description: Authentication error! Incorrect login/password input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
 
   /auth/activation:
     patch:
@@ -88,10 +104,22 @@ paths:
       responses:
         '200':
           description: Account was confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '400':
           description: Account is already confirmed!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '404':
           description: The link isn't valid. User with such user id not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
 
   /parser/settings:
     post:
@@ -110,6 +138,10 @@ paths:
       responses:
         '201':
           description: Settings were Successfully Set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -147,6 +179,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
             minimum: 1
           description: Parser Settings ID
       operationId: showParserSettings
@@ -171,15 +204,19 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
             minimum: 1
           description: Parser Settings ID
       operationId: runParser
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
-
 
 components:
 
@@ -194,6 +231,14 @@ components:
       description: Access token is missing or invalid
 
   schemas:
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
     User:
       type: object
       required:
@@ -256,6 +301,7 @@ components:
       properties:
         accessToken:
           type: string
+          pattern: ^Bearer\s.+$
         id:
           type: integer
           format: int64

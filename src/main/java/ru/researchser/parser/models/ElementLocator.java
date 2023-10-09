@@ -27,6 +27,7 @@ public abstract class ElementLocator {
     private Long id;
     private ElementType type;
     private String pathToLocator;
+    private String extraPointer; // for Tag + Attribute
     @ManyToOne
     private UserParseSetting userParseSetting;
 }
