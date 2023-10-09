@@ -14,22 +14,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import ru.researchser.mailSender.services.MailSenderService;
-import ru.researchser.mailSender.services.SendMailRequest;
+import ru.researchser.services.mailSender.MailSenderService;
+import ru.researchser.services.mailSender.SendMailRequest;
 import ru.researchser.openapi.api.AuthApiDelegate;
-import ru.researchser.openapi.model.JwtResponse;
-import ru.researchser.openapi.model.LoginRequest;
-import ru.researchser.openapi.model.MessageResponse;
-import ru.researchser.openapi.model.SignupRequest;
-import ru.researchser.security.services.JwtUtils;
-import ru.researchser.security.user.UserDetailsImpl;
-import ru.researchser.security.utils.CryptoUtil;
-import ru.researchser.user.models.Role;
-import ru.researchser.user.models.User;
-import ru.researchser.user.models.enums.ERole;
-import ru.researchser.user.models.enums.UserStatus;
-import ru.researchser.user.repositories.RoleRepository;
-import ru.researchser.user.repositories.UserRepository;
+import ru.researchser.openapi.model.*;
+import ru.researchser.services.security.JwtUtils;
+import ru.researchser.utils.CryptoUtil;
+import ru.researchser.models.user.Role;
+import ru.researchser.models.user.User;
+import ru.researchser.models.user.enums.ERole;
+import ru.researchser.repositories.RoleRepository;
+import ru.researchser.repositories.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +49,7 @@ public class AuthController implements AuthApiDelegate {
     @Override
     @PostMapping("/signin")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponseOpenApi> authenticateUser(@Valid @RequestBody LoginRequestOpenApi loginRequest) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -63,17 +58,17 @@ public class AuthController implements AuthApiDelegate {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication);
 
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
+            User user = (User) authentication.getPrincipal();
+            List<String> roles = user.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
             return ResponseEntity
-                    .ok(new JwtResponse(jwt,
-                    userDetails.getId(),
-                    userDetails.getUsername(),
-                    userDetails.getEmail(),
-                    roles));
+                    .ok(new JwtResponseOpenApi(jwt,
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            roles));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -82,22 +77,22 @@ public class AuthController implements AuthApiDelegate {
     @Override
     @PostMapping("/signup")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<MessageResponseOpenApi> registerUser(@Valid @RequestBody SignupRequestOpenApi signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body(new MessageResponse("Account with such username is already in use!"));
+                    .body(new MessageResponseOpenApi("Account with such username is already in use!"));
         }
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Account with such email is already in use!"));
+                    .body(new MessageResponseOpenApi("Account with such email is already in use!"));
         }
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
 
-        user.setUserStatus(UserStatus.WAIT_FOR_EMAIL_VERIFICATION);
+        user.setUserStatus(UserStatusOpenApi.WAIT_FOR_EMAIL_VERIFICATION);
 
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName(ERole.ROLE_USER)
@@ -116,27 +111,27 @@ public class AuthController implements AuthApiDelegate {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new MessageResponse("User registered successfully and waits for email verification!"));
+                .body(new MessageResponseOpenApi("User registered successfully and waits for email verification!"));
     }
 
     @Override
     @PatchMapping("/activation")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<MessageResponse> activateUser(@RequestParam("id") String cryptoUserId) {
+    public ResponseEntity<MessageResponseOpenApi> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isEmpty()) {
             User user = userOptional.get();
-            if (user.getUserStatus().equals(UserStatus.WAIT_FOR_EMAIL_VERIFICATION)) {
-                user.setUserStatus(UserStatus.CONFIRMED_ACCOUNT);
+            if (user.getUserStatus().equals(UserStatusOpenApi.WAIT_FOR_EMAIL_VERIFICATION)) {
+                user.setUserStatus(UserStatusOpenApi.CONFIRMED_ACCOUNT);
                 userRepository.save(user);
                 return ResponseEntity
-                        .ok(new MessageResponse("Account confirmed successfully"));
-            } else if (user.getUserStatus().equals(UserStatus.CONFIRMED_ACCOUNT)) {
+                        .ok(new MessageResponseOpenApi("Account confirmed successfully"));
+            } else if (user.getUserStatus().equals(UserStatusOpenApi.CONFIRMED_ACCOUNT)) {
                 log.debug("Account is already confirmed!");
                 return ResponseEntity
                         .badRequest()
-                        .body(new MessageResponse("Account is already confirmed!"));
+                        .body(new MessageResponseOpenApi("Account is already confirmed!"));
             }
         }
         log.debug("User with such user id not found. Link isn't valid");

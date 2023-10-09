@@ -26,7 +26,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -41,26 +41,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignupRequest'
+              $ref: '#/components/schemas/SignupRequestOpenApi'
       responses:
         '201':
           description: User registered successfully and waits for email verification!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '400':
           description: Account with such email is already in use!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '409':
           description: Account with such username is already in use!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
 
   /auth/signin:
     post:
@@ -73,20 +73,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequestOpenApi"
       responses:
         '200':
           description: Successfully Logged In
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JwtResponse'
+                $ref: "#/components/schemas/JwtResponseOpenApi"
         '400':
           description: Authentication error! Incorrect login/password input.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
 
   /auth/activation:
     patch:
@@ -107,19 +107,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '400':
           description: Account is already confirmed!
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '404':
           description: The link isn't valid. User with such user id not found.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
 
   /parser/settings:
     post:
@@ -134,14 +134,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserParserSettings"
+              $ref: "#/components/schemas/UserParserSettingsOpenApi"
       responses:
         '201':
           description: Settings were Successfully Set
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -161,7 +161,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ParserResult'
+                  $ref: '#/components/schemas/ParserResultOpenApi'
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -189,7 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ParserResult"
+                $ref: "#/components/schemas/ParserResultOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -214,7 +214,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/MessageResponseOpenApi"
+        '400':
+          description: This Parser Settings wasn't found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponseOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -231,7 +237,7 @@ components:
       description: Access token is missing or invalid
 
   schemas:
-    MessageResponse:
+    MessageResponseOpenApi:
       type: object
       required:
         - message
@@ -239,7 +245,7 @@ components:
         message:
           type: string
 
-    User:
+    UserOpenApi:
       type: object
       required:
         - username
@@ -250,22 +256,53 @@ components:
           type: string
         email:
           type: string
+        roles:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/RoleOpenApi"
         userStatus:
           type: object
-          $ref: "#/components/schemas/UserStatus"
+          $ref: "#/components/schemas/UserStatusOpenApi"
         userParseSettings:
           type: array
           items:
             type: object
-            $ref: "#/components/schemas/ParserResult"
+            $ref: "#/components/schemas/UserParserSettingsOpenApi"
+        parserResults:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/ParserResultOpenApi"
+        telegramUserId:
+          type: string
 
-    UserStatus:
+    RoleOpenApi:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: object
+          $ref: "#/components/schemas/ERoleOpenApi"
+
+
+    ERoleOpenApi:
+      type: string
+      enum:
+        - ROLE_USER
+        - ROLE_ADMIN
+
+    UserStatusOpenApi:
       type: string
       enum:
         - CONFIRMED_ACCOUNT
         - WAIT_FOR_EMAIL_VERIFICATION
 
-    LoginRequest:
+    LoginRequestOpenApi:
       type: object
       required:
         - username
@@ -276,7 +313,7 @@ components:
         password:
           type: string
 
-    SignupRequest:
+    SignupRequestOpenApi:
       type: object
       required:
         - username
@@ -290,7 +327,7 @@ components:
         password:
           type: string
 
-    JwtResponse:
+    JwtResponseOpenApi:
       type: object
       required:
         - accessToken
@@ -314,7 +351,7 @@ components:
           items:
             type: string
 
-    ParserResult:
+    ParserResultOpenApi:
       type: object
       required:
         - id
@@ -326,11 +363,11 @@ components:
           format: int64
         userParserSettings:
           type: object
-          $ref: "#/components/schemas/UserParserSettings"
+          $ref: "#/components/schemas/UserParserSettingsOpenApi"
         linkToDownloadResults:
           type: string
 
-    UserParserSettings:
+    UserParserSettingsOpenApi:
       type: object
       required:
         - firstPageUrl
@@ -361,13 +398,13 @@ components:
           type: array
           items:
             type: object
-            $ref: "#/components/schemas/ElementLocator"
+            $ref: "#/components/schemas/ElementLocatorOpenApi"
         outputFileType:
           type: object
-          $ref: "#/components/schemas/OutputFileType"
+          $ref: "#/components/schemas/OutputFileTypeOpenApi"
 
 
-    ElementLocator:
+    ElementLocatorOpenApi:
       type: object
       required:
         - elementType
@@ -378,19 +415,19 @@ components:
           format: int64
         elementType:
           type: object
-          $ref: "#/components/schemas/ElementType"
+          $ref: "#/components/schemas/ElementTypeOpenApi"
         pathToLocator:
           type: string
         extraPointer:
           type: string
 
-    OutputFileType:
+    OutputFileTypeOpenApi:
       type: string
       enum:
         - XLSX
         - CSV
 
-    ElementType:
+    ElementTypeOpenApi:
       type: string
       enum:
         - XPATH

@@ -1,26 +1,20 @@
 package ru.researchser.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.NativeWebRequest;
+import ru.researchser.mappers.UserParserSettingsMapper;
 import ru.researchser.openapi.api.ParserApiDelegate;
-import ru.researchser.openapi.model.MessageResponse;
-import ru.researchser.openapi.model.ParserResult;
-import ru.researchser.openapi.model.UserParserSettings;
-import ru.researchser.parser.models.UserParseSetting;
-import ru.researchser.parser.services.ParserService;
+import ru.researchser.openapi.model.MessageResponseOpenApi;
+import ru.researchser.openapi.model.ParserResultOpenApi;
+import ru.researchser.openapi.model.UserParserSettingsOpenApi;
+import ru.researchser.models.parser.UserParserSetting;
+import ru.researchser.repositories.UserParseSettingRepository;
+import ru.researchser.services.parser.ParserService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,38 +22,50 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/parser")
 @AllArgsConstructor
+@Log4j
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
+    private final UserParserSettingsMapper parserSettingsMapper;
+    private final UserParseSettingRepository parseSettingRepository;
 
     @Override
-    public ResponseEntity<List<ParserResult>> getAllParserQueries() {
+    public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
         return ParserApiDelegate.super.getAllParserQueries();
     }
+
     @Override
     @GetMapping
-    public ResponseEntity<ParserResult> showParserSettings(@RequestParam("id") @Valid Long id) {
+    public ResponseEntity<ParserResultOpenApi> showParserSettings(@RequestParam("id") @Valid Long id) {
         return ParserApiDelegate.super.showParserSettings(id);
     }
 
     @Override
     @PostMapping("/settings")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<MessageResponse> setParserSettings(@RequestBody UserParseSetting userParseSetting) {
-        // TODO: fix with mapped object UserParseSetting
+    public ResponseEntity<MessageResponseOpenApi> setParserSettings(@RequestBody UserParserSettingsOpenApi userParserSettingsOpenApi) {
+        UserParserSetting userParserSettings = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
+        parseSettingRepository.save(userParserSettings);
         return ResponseEntity
-                .ok(new MessageResponse("The settings were set successfuly!"));
+                .ok(new MessageResponseOpenApi("The settings were set successfuly!"));
     }
 
     @Override
     @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<MessageResponse> runParser(@RequestParam("id") @Valid Long id) {
-        //TODO: finish the method logic
-        UserParseSetting userParseSetting = new UserParseSetting();
-        String outputFilePath = parserService.runParser(userParseSetting);
-        //session.setAttribute("outputFilePath", outputFilePath);
+    public ResponseEntity<MessageResponseOpenApi> runParser(@RequestParam("id") @Valid Long id) {
+        Optional<UserParserSetting> userParserSettingOpt = parseSettingRepository.findById(id);
+        UserParserSetting userParserSetting;
+        if (userParserSettingOpt.isPresent()) {
+            userParserSetting = userParserSettingOpt.get();
+        } else {
+            log.debug("userParserSetting was empty, no such object in db");
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponseOpenApi("This Parser Settings wasn't found"));
+        }
+        String outputFilePath = parserService.runParser(userParserSetting);
         return ResponseEntity
-                .ok(new MessageResponse("The information was collected successfuly!"));
+                .ok(new MessageResponseOpenApi("The information was collected successfuly!"));
     }
 
 //    @GetMapping
