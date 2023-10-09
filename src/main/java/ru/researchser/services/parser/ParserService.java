@@ -34,7 +34,7 @@ public class ParserService {
     private final List<ParseElement> parsingTypes = new ArrayList<>();
     private final HashMap<String, List<String>> allPagesParseResult = new HashMap<>();
 
-    public String runParser(UserParserSetting userParserSetting) {
+    public String runParser(UserParserSetting userParserSetting, String username) {
         driver = new ChromeDriver(chromeOptions);
         String firstPageURL = userParserSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
@@ -64,18 +64,20 @@ public class ParserService {
         StringBuilder fileNameBuilder = new StringBuilder(UUID.randomUUID().toString());
         fileNameBuilder.append("file");
 
-        if(fileType == OutputFileType.XLSX) {
-            fileNameBuilder.append(".xlsx");
-        } else {
+        if(fileType == OutputFileType.CSV) {
             fileNameBuilder.append(".csv");
         }
 
+        List<String> header = userParserSetting.getHeader();
+        header.add(0, "URL");
+
         String fileName = fileNameBuilder.toString();
-        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + fileName;
+        String outPutFilePath = "src/main/resources/savedFilesDirectory/" + username + "/" +fileName;
         OutputFile outputFile = new OutputFile(fileType);
-        outputFile.exportData(userParserSetting.getHeader(), allPagesParseResult, outPutFilePath);
+        outputFile.exportData(header, allPagesParseResult, outPutFilePath);
         return outPutFilePath;
     }
+
     public void clickNextPageButton (String cssSelectorNextPage) {
         WebElement nextPageButton = driver.findElement(By.cssSelector(cssSelectorNextPage)); // "body > div > div.pro_field > div > div > a.next"
         nextPageButton.click();

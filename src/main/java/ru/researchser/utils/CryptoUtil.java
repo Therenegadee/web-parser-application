@@ -14,6 +14,7 @@ public class CryptoUtil {
         return hashids.encode(value);
     }
 
+
     public Long idOf(String value) {
         long[] res = hashids.decode(value);
         if (res != null && res.length > 0) {

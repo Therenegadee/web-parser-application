@@ -7,7 +7,7 @@ import ru.researchser.models.user.User;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
     User toUser(UserOpenApi userOpenApi);
     User toUser(UserDTO userDTO);

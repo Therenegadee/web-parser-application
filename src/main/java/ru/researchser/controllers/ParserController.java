@@ -5,13 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mappers.UserParserSettingsMapper;
+import ru.researchser.models.parser.ParserResult;
+import ru.researchser.models.user.User;
 import ru.researchser.openapi.api.ParserApiDelegate;
 import ru.researchser.openapi.model.MessageResponseOpenApi;
 import ru.researchser.openapi.model.ParserResultOpenApi;
 import ru.researchser.openapi.model.UserParserSettingsOpenApi;
 import ru.researchser.models.parser.UserParserSetting;
+import ru.researchser.repositories.ParserResultRepository;
 import ru.researchser.repositories.UserParseSettingRepository;
 import ru.researchser.services.parser.ParserService;
 
@@ -27,6 +31,7 @@ public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
     private final UserParserSettingsMapper parserSettingsMapper;
     private final UserParseSettingRepository parseSettingRepository;
+    private final ParserResultRepository parserResultRepository;
 
     @Override
     public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
@@ -63,7 +68,15 @@ public class ParserController implements ParserApiDelegate {
                     .badRequest()
                     .body(new MessageResponseOpenApi("This Parser Settings wasn't found"));
         }
-        String outputFilePath = parserService.runParser(userParserSetting);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = user.getUsername();
+        String outputFilePath = parserService.runParser(userParserSetting, username);
+        ParserResult parserResult = ParserResult
+                .builder()
+                .linkToDownloadResults(outputFilePath)
+                .userParserSettings(parserSettingsMapper.toOpenApi(userParserSetting))
+                .build();
+        parserResultRepository.save(parserResult);
         return ResponseEntity
                 .ok(new MessageResponseOpenApi("The information was collected successfuly!"));
     }
