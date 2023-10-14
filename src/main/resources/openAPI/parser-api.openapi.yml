@@ -45,22 +45,10 @@ paths:
       responses:
         '201':
           description: User registered successfully and waits for email verification!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
         '400':
           description: Account with such email is already in use!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
         '409':
           description: Account with such username is already in use!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
 
   /auth/signin:
     post:
@@ -83,10 +71,6 @@ paths:
                 $ref: "#/components/schemas/JwtResponseOpenApi"
         '400':
           description: Authentication error! Incorrect login/password input.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
 
   /auth/activation:
     patch:
@@ -104,22 +88,13 @@ paths:
       responses:
         '200':
           description: Account was confirmed successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
+
         '400':
           description: Account is already confirmed!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
+
         '404':
           description: The link isn't valid. User with such user id not found.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
+
 
   /parser/settings:
     post:
@@ -138,10 +113,6 @@ paths:
       responses:
         '201':
           description: Settings were Successfully Set
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
 
@@ -211,18 +182,40 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
         '400':
           description: This Parser Settings wasn't found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MessageResponseOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
+
+  /parser/{id}/download:
+    get:
+      security:
+        - bearerAuth: [ ]
+      summary: Download Results File With the Specific ID
+      tags:
+        - Parser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          description: Parser Results File ID
+      operationId: downloadFile
+      responses:
+        200:
+          description: The file download was successful
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        401:
+          $ref: "#/components/responses/UnauthorizedError"
+        500:
+          description: Internal Server Error
 
 components:
 
@@ -237,13 +230,6 @@ components:
       description: Access token is missing or invalid
 
   schemas:
-    MessageResponseOpenApi:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
 
     UserOpenApi:
       type: object

@@ -77,16 +77,16 @@ public class AuthController implements AuthApiDelegate {
     @Override
     @PostMapping("/signup")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<MessageResponseOpenApi> registerUser(@Valid @RequestBody SignupRequestOpenApi signUpRequest) {
+    public ResponseEntity<Void> registerUser(@Valid @RequestBody SignupRequestOpenApi signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body(new MessageResponseOpenApi("Account with such username is already in use!"));
+                    .build();
         }
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponseOpenApi("Account with such email is already in use!"));
+                    .build();
         }
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
@@ -111,13 +111,13 @@ public class AuthController implements AuthApiDelegate {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new MessageResponseOpenApi("User registered successfully and waits for email verification!"));
+                .build();
     }
 
     @Override
     @PatchMapping("/activation")
     @PreAuthorize("isAnonymous()")
-    public ResponseEntity<MessageResponseOpenApi> activateUser(@RequestParam("id") String cryptoUserId) {
+    public ResponseEntity<Void> activateUser(@RequestParam("id") String cryptoUserId) {
         Long userId = cryptoUtil.idOf(cryptoUserId);
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isEmpty()) {
@@ -126,17 +126,18 @@ public class AuthController implements AuthApiDelegate {
                 user.setUserStatus(UserStatusOpenApi.CONFIRMED_ACCOUNT);
                 userRepository.save(user);
                 return ResponseEntity
-                        .ok(new MessageResponseOpenApi("Account confirmed successfully"));
+                        .ok()
+                        .build();
             } else if (user.getUserStatus().equals(UserStatusOpenApi.CONFIRMED_ACCOUNT)) {
                 log.debug("Account is already confirmed!");
                 return ResponseEntity
                         .badRequest()
-                        .body(new MessageResponseOpenApi("Account is already confirmed!"));
+                        .build();
             }
         }
         log.debug("User with such user id not found. Link isn't valid");
         return ResponseEntity
-                .notFound()
+                .status(HttpStatus.NOT_FOUND)
                 .build();
     }
 

@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.0.2</version>
+			<version>2.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -135,11 +135,6 @@
 			<version>3.1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots</artifactId>
-			<version>5.2.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.hashids</groupId>
 			<artifactId>hashids</artifactId>
 			<version>1.0.1</version>
@@ -147,12 +142,12 @@
 		<dependency>
 			<groupId>io.swagger.parser.v3</groupId>
 			<artifactId>swagger-parser</artifactId>
-			<version>2.0.26</version>
+			<version>2.1.14</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openapitools</groupId>
 			<artifactId>openapi-generator</artifactId>
-			<version>5.3.0</version>
+			<version>6.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openapitools</groupId>
@@ -167,7 +162,12 @@
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
-			<version>1.2</version>
+			<version>1.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
@@ -231,10 +231,13 @@
 							<generatorName>spring</generatorName>
 							<apiPackage>ru.researchser.openapi.api</apiPackage>
 							<modelPackage>ru.researchser.openapi.model</modelPackage>
+							<generateModelTests>false</generateModelTests>
+							<generateApiTests>false</generateApiTests>
 							<supportingFilesToGenerate>
 								ApiUtil.java
 							</supportingFilesToGenerate>
 							<configOptions>
+								<useResponseEntity>true</useResponseEntity>
 								<delegatePattern>true</delegatePattern>
 							</configOptions>
 						</configuration>
