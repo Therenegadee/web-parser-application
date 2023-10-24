@@ -14,15 +14,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.researchser.mappers.ParserResultMapper;
 import ru.researchser.mappers.UserParserSettingsMapper;
-import ru.researchser.models.parser.ParserResult;
-import ru.researchser.models.user.User;
+import ru.researchser.models.ParserResult;
+import ru.researchser.models.User;
 import ru.researchser.openapi.api.ParserApiDelegate;
 import ru.researchser.openapi.model.ParserResultOpenApi;
 import ru.researchser.openapi.model.UserParserSettingsOpenApi;
-import ru.researchser.models.parser.UserParserSetting;
+import ru.researchser.models.UserParserSetting;
 import ru.researchser.repositories.ParserResultRepository;
 import ru.researchser.repositories.UserParseSettingRepository;
-import ru.researchser.services.parser.ParserService;
+import ru.researchser.services.interfaces.ParserService;
+import ru.researchser.services.parser.ParserRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,22 +41,18 @@ import java.util.Optional;
 @Log4j
 public class ParserController implements ParserApiDelegate {
     private final ParserService parserService;
-    private final UserParserSettingsMapper parserSettingsMapper;
-    private final ParserResultMapper parserResultMapper;
-    private final UserParseSettingRepository parseSettingRepository;
-    private final ParserResultRepository parserResultRepository;
 
     @Override
     public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
         return ResponseEntity
-                .ok(parserResultMapper.toOpenApi(parserResultRepository.findAll()));
+                .ok(parserService.getAllParserQueries());
 
     }
 
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<ParserResultOpenApi> showParserSettings(@PathVariable("id") @Valid Long id) {
-        return ParserApiDelegate.super.showParserSettings(id);
+        return ;
     }
 
     @Override
@@ -85,7 +82,7 @@ public class ParserController implements ParserApiDelegate {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = user.getUsername();
 
-        Path path = Paths.get(parserService.runParser(userParserSetting, username));
+        Path path = Paths.get(parserRunner.runParser(userParserSetting, username));
 
         byte[] byteData;
         try {

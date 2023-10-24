@@ -2,7 +2,7 @@ package ru.researchser.mappers;
 
 import org.mapstruct.Mapper;
 import ru.researchser.openapi.model.UserParserSettingsOpenApi;
-import ru.researchser.models.parser.UserParserSetting;
+import ru.researchser.models.UserParserSetting;
 
 @Mapper(componentModel = "spring")
 public interface UserParserSettingsMapper {

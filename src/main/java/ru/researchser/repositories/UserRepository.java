@@ -2,7 +2,7 @@ package ru.researchser.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.researchser.models.user.User;
+import ru.researchser.models.User;
 
 import java.util.Optional;
 
