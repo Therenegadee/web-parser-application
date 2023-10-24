@@ -1,4 +1,4 @@
-package ru.researchser.mappers;
+package ru.researchser.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import ru.researchser.openapi.model.ElementLocatorOpenApi;

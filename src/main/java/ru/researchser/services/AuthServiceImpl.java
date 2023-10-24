@@ -20,7 +20,7 @@ import ru.researchser.models.enums.TokenType;
 import ru.researchser.openapi.model.JwtResponseOpenApi;
 import ru.researchser.openapi.model.LoginRequestOpenApi;
 import ru.researchser.openapi.model.SignupRequestOpenApi;
-import ru.researchser.repositories.EmailTokenRepository;
+import ru.researchser.DAO.interfaces.EmailTokenDao;
 import ru.researchser.security.JwtUtils;
 import ru.researchser.services.interfaces.AuthService;
 import ru.researchser.services.interfaces.UserService;
@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final JwtUtils jwtUtils;
     private final MailSenderService senderService;
-    private final EmailTokenRepository emailTokenRepository;
+    private final EmailTokenDao emailTokenDao;
 
     @Override
     public ResponseEntity<Void> registerUser(SignupRequestOpenApi signUpRequest) {
@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User checkActivationTokenIsValid(String activationToken) {
-        EmailToken token = emailTokenRepository.findByToken(activationToken);
+        EmailToken token = emailTokenDao.findByToken(activationToken);
         if (Objects.isNull(token)) {
             throw new NotFoundException("The Link isn't Valid");
         }
@@ -81,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
             User user = token.getUser();
             ActivationStatus activationStatus = user.getActivationStatus();
             if (!activationStatus.equals(ActivationStatus.VERIFIED) && tokenType.equals(TokenType.ACTIVATION)) {
-                emailTokenRepository.delete(token);
+                emailTokenDao.delete(token);
                 return user;
             } else {
                 throw new BadRequestException("You already verified your email!");

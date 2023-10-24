@@ -11,15 +11,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.researchser.exceptions.BadRequestException;
 import ru.researchser.exceptions.NotFoundException;
-import ru.researchser.mappers.UserMapper;
+import ru.researchser.mappers.openapi.UserMapper;
 import ru.researchser.models.Role;
 import ru.researchser.models.User;
 import ru.researchser.models.enums.ActivationStatus;
 import ru.researchser.models.enums.ERole;
 import ru.researchser.openapi.model.SignupRequestOpenApi;
 import ru.researchser.openapi.model.UserOpenApi;
-import ru.researchser.repositories.RoleRepository;
-import ru.researchser.repositories.UserRepository;
+import ru.researchser.DAO.interfaces.RoleDao;
+import ru.researchser.DAO.interfaces.UserDao;
 import ru.researchser.services.interfaces.UserService;
 
 import java.util.Objects;
@@ -29,9 +29,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Log4j
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final UserRepository userRepository;
+    private final UserDao userDao;
     private final UserMapper userMapper;
-    private final RoleRepository roleRepository;
+    private final RoleDao roleDao;
     private final PasswordEncoder encoder;
 
     @Override
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository
+        return userDao
                 .findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username: %s Not Found" + username));
     }
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setId(usernameOrEmailExistsCheck(user.getUsername(), user.getEmail()).getId());
         }
         setRole(user);
-        return userRepository.save(user);
+        return userDao.save(user);
     }
 
     @Override
@@ -98,13 +98,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private User usernameOrEmailExistsCheck(String username, String email) {
         if (usernameExistsCheck(username)) {
-            return userRepository.findByUsername(username).get();
+            return userDao.findByUsername(username).get();
         } else if (!usernameExistsCheck(username)){
             throw new NotFoundException(String.format(
                     "User with username %s wasn't not found!", username));
         }
         if (emailExistsCheck(email)) {
-            return userRepository.findByEmail(email).get();
+            return userDao.findByEmail(email).get();
         } else {
             throw new BadRequestException(String.format(
                     "User with email %s wasn't not found!", email));
@@ -114,17 +114,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     private boolean usernameExistsCheck(String username) {
-        return userRepository.findByUsername(username).isPresent();
+        return userDao.findByUsername(username).isPresent();
     }
 
     @Transactional
     private boolean emailExistsCheck(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return userDao.findByEmail(email).isPresent();
     }
 
     @Transactional
     private void setRole(User user) {
-        roleRepository.findByName(ERole.ROLE_USER).ifPresentOrElse(
+        roleDao.findByName(ERole.ROLE_USER).ifPresentOrElse(
                 (role) -> user.setRoles(Set.of(role)),
                 () -> user.setRoles(Set.of(new Role(ERole.ROLE_USER)))
         );

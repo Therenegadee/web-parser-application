@@ -2,19 +2,18 @@ package ru.researchser.models;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import ru.researchser.services.parser.logic.element.CssSelectorElement;
-import ru.researchser.services.parser.logic.element.ElementType;
+import ru.researchser.models.enums.ElementType;
 import ru.researchser.services.parser.logic.element.TagAttrElement;
 import ru.researchser.services.parser.logic.element.XPathElement;
 
-import static jakarta.persistence.InheritanceType.JOINED;
-
-@Data
-@Entity
-@Table(name = "ElementLocator")
-@Inheritance(strategy = JOINED)
+@Getter
+@Setter
+@Builder
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = XPathElement.class, name = "XPath"),
@@ -22,12 +21,9 @@ import static jakarta.persistence.InheritanceType.JOINED;
         @JsonSubTypes.Type(value = TagAttrElement.class, name = "Tag+Attribute"),
 })
 public class ElementLocator {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private ElementType type;
     private String pathToLocator;
     private String extraPointer; // for Tag + Attribute
-    @ManyToOne
     private UserParserSetting userParserSetting;
 }

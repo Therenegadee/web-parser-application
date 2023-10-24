@@ -154,7 +154,7 @@ paths:
             format: int64
             minimum: 1
           description: Parser Settings ID
-      operationId: showParserSettings
+      operationId: showParserResultsById
       responses:
         '200':
           description: OK

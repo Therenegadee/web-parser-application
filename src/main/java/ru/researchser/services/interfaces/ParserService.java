@@ -10,7 +10,7 @@ import java.util.List;
 public interface ParserService {
     List<ParserResultOpenApi> getAllParserQueries();
 
-    ParserResultOpenApi showParserSettings(Long id);
+    ParserResultOpenApi showParserResultsById(Long id);
 
     ResponseEntity<Void> setParserSettings(UserParserSettingsOpenApi userParserSettingsOpenApi);
 

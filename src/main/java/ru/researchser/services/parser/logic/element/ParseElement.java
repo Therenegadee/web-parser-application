@@ -2,6 +2,7 @@ package ru.researchser.services.parser.logic.element;
 
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.researchser.models.enums.ElementType;
 import ru.researchser.services.parser.logic.parameter.ParseAlgorithm;
 import ru.researchser.services.parser.logic.parameter.ParseParameter;
 
