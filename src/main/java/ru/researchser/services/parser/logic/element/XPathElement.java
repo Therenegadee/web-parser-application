@@ -10,17 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.researchser.services.parser.logic.parameter.ParseAlgorithm;
 import ru.researchser.services.parser.logic.parameter.ParseParameter;
 import ru.researchser.services.parser.logic.parameter.OneParseParameter;
-import ru.researchser.models.parser.ElementLocator;
+import ru.researchser.models.ElementLocator;
 
 import java.time.Duration;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
 public class XPathElement extends ElementLocator implements ParseAlgorithm {
     @Autowired
     private WebDriver driver;
+
+    @Autowired
+    public XPathElement(WebDriver driver) {
+        this.driver = driver;
+    }
 
     @Override
     public String parseByParameters(ParseParameter abstractParseParameter, String url) {

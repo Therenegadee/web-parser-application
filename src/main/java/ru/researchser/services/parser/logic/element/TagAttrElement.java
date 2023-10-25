@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.researchser.services.parser.logic.parameter.ParseAlgorithm;
 import ru.researchser.services.parser.logic.parameter.ParseParameter;
 import ru.researchser.services.parser.logic.parameter.TwoParseParameters;
-import ru.researchser.models.parser.ElementLocator;
+import ru.researchser.models.ElementLocator;
 
 import java.time.Duration;
 

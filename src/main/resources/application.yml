@@ -9,15 +9,6 @@ spring:
     password: parserDataBase
     url: jdbc:postgresql://localhost:5432/postgres
     username: user
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show_sql: true
-    properties:
-      hibernate:
-      format_sql: true
-      database: postgresql
-      database-platform: org.hibernate.dialect.PostgreSQL95Dialect
   mail:
     host: smtp.yandex.ru
     port: 465
