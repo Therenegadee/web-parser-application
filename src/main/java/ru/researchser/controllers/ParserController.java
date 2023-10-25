@@ -3,24 +3,16 @@ package ru.researchser.controllers;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.researchser.models.ParserResult;
 import ru.researchser.openapi.api.ParserApiDelegate;
 import ru.researchser.openapi.model.ParserResultOpenApi;
 import ru.researchser.openapi.model.UserParserSettingsOpenApi;
 import ru.researchser.services.interfaces.ParserService;
 
-import java.io.ByteArrayInputStream;
-import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -33,7 +25,7 @@ public class ParserController implements ParserApiDelegate {
     @Override
     public ResponseEntity<List<ParserResultOpenApi>> getAllParserQueries() {
         return ResponseEntity
-                .ok(parserService.getAllParserQueries());
+                .ok(parserService.getAllParserQueries().stream().toList());
 
     }
 

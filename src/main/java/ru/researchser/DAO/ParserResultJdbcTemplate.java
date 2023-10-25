@@ -12,10 +12,7 @@ import ru.researchser.models.ParserResult;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -98,6 +95,16 @@ public class ParserResultJdbcTemplate implements ParserResultDao {
             return new HashSet<>(jdbcTemplate.query(query, parserResultMapper, id));
         } else {
             throw new IllegalStateException("The id is null!");
+        }
+    }
+
+    @Override
+    public Set<ParserResult> findAllByIds(List<Long> ids) {
+        if (Objects.nonNull(ids) && !ids.isEmpty()) {
+            String query = "SELECT * FROM parser_results WHERE id IN (?)";
+            return new HashSet<>(jdbcTemplate.query(query, parserResultMapper, ids));
+        } else {
+            throw new IllegalStateException("The ids are null!");
         }
     }
 

@@ -6,8 +6,8 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.researchser.openapi.api.AuthorizationApiDelegate;
 import ru.researchser.services.interfaces.AuthService;
-import ru.researchser.openapi.api.AuthApiDelegate;
 import ru.researchser.openapi.model.*;
 
 @RestController
@@ -15,7 +15,7 @@ import ru.researchser.openapi.model.*;
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Log4j
-public class AuthController implements AuthApiDelegate {
+public class AuthController implements AuthorizationApiDelegate {
     private final AuthService authService;
 
     @Override

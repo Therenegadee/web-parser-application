@@ -239,6 +239,7 @@
 							<configOptions>
 								<useResponseEntity>true</useResponseEntity>
 								<delegatePattern>true</delegatePattern>
+								<useTags>true</useTags>
 							</configOptions>
 						</configuration>
 					</execution>

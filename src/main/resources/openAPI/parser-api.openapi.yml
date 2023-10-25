@@ -251,16 +251,16 @@ components:
         userStatus:
           type: object
           $ref: "#/components/schemas/UserStatusOpenApi"
-        userParseSettings:
+        userParseSettingsIds:
           type: array
           items:
-            type: object
-            $ref: "#/components/schemas/UserParserSettingsOpenApi"
-        parserResults:
+            type: integer
+            format: int64
+        parserResultsIds:
           type: array
           items:
-            type: object
-            $ref: "#/components/schemas/ParserResultOpenApi"
+            type: integer
+            format: int64
         telegramUserId:
           type: string
 
@@ -334,15 +334,15 @@ components:
       type: object
       required:
         - id
-        - userParserSettings
+        - userParserSettingsId
         - linkToDownloadResults
       properties:
         id:
           type: integer
           format: int64
-        userParserSettings:
-          type: object
-          $ref: "#/components/schemas/UserParserSettingsOpenApi"
+        userParserSettingsId:
+          type: integer
+          format: int64
         linkToDownloadResults:
           type: string
 
@@ -355,7 +355,7 @@ components:
         - tagName
         - cssSelectorNextPage
         - header
-        - parseSettingElements
+        - elementLocatorsIds
         - outputFileType
       properties:
         firstPageUrl:
@@ -373,11 +373,11 @@ components:
           type: array
           items:
             type: string
-        parseSettingElements:
+        elementLocatorsIds:
           type: array
           items:
-            type: object
-            $ref: "#/components/schemas/ElementLocatorOpenApi"
+            type: integer
+            format: int64
         outputFileType:
           type: object
           $ref: "#/components/schemas/OutputFileTypeOpenApi"
@@ -388,6 +388,7 @@ components:
       required:
         - elementType
         - pathToLocator
+        - userParserSettingsId
       properties:
         id:
           type: integer
@@ -399,6 +400,9 @@ components:
           type: string
         extraPointer:
           type: string
+        userParserSettingsId:
+          type: integer
+          format: int64
 
     OutputFileTypeOpenApi:
       type: string

@@ -21,6 +21,7 @@ public interface ParserResultDao {
     Set<ParserResult> findAll();
 
     Set<ParserResult> findAllByUserId(Long id);
+    Set<ParserResult> findAllByIds(List<Long> ids);
 
     int deleteById(Long id);
 
