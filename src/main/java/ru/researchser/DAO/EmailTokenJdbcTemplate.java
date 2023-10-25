@@ -74,20 +74,20 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
 
     @Override
     public EmailToken update(EmailToken emailToken) {
-        if (Objects.isNull(emailToken)) throw new IllegalArgumentException("ElementLocator is Null!");
+        if (Objects.isNull(emailToken)) throw new IllegalArgumentException("Email Token is Null!");
         Long id = emailToken.getId();
         return updateById(id, emailToken);
     }
 
     @Override
     public EmailToken updateById(Long id, EmailToken emailToken) {
-        if (Objects.isNull(emailToken)) throw new IllegalArgumentException("ElementLocator is Null!");
+        if (Objects.isNull(emailToken)) throw new IllegalArgumentException("Email Token is Null!");
         if (Objects.nonNull(id) && findById(id).isPresent()) {
             Date date = new Date(emailToken.getExpirationDate().getTime());
             String query = "UPDATE email_tokens SET token=?,expiration_date=?,user_id=?," +
                     "token_type=? WHERE id=?";
             int rows = jdbcTemplate.update(query, emailToken.getToken(), date,
-                    emailToken.getUser().getId(), emailToken.getTokenType().getValue());
+                    emailToken.getUser().getId(), emailToken.getTokenType().getValue(), id);
             if (rows != 1) {
                 throw new RuntimeException("Invalid request in SQL: " + query);
             }

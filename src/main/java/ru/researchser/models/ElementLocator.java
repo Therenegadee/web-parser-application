@@ -2,10 +2,7 @@ package ru.researchser.models;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.researchser.services.parser.logic.element.CssSelectorElement;
 import ru.researchser.models.enums.ElementType;
 import ru.researchser.services.parser.logic.element.TagAttrElement;
@@ -13,6 +10,8 @@ import ru.researchser.services.parser.logic.element.XPathElement;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({

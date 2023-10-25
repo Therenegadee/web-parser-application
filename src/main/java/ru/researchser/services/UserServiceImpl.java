@@ -1,6 +1,5 @@
 package ru.researchser.services;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +21,7 @@ import ru.researchser.DAO.interfaces.RoleDao;
 import ru.researchser.DAO.interfaces.UserDao;
 import ru.researchser.services.interfaces.UserService;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,7 +40,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userDao
                 .findByUsername(username)
@@ -54,8 +53,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 signUpRequest.getEmail(),
                 signUpRequest.getPassword());
         user.setActivationStatus(ActivationStatus.WAIT_FOR_EMAIL_VERIFICATION);
-        setRole(user);
-        return saveOrUpdateUser(user);
+        User savedUser = saveOrUpdateUser(user);
+        if(user.getRoles().isEmpty()) {
+            setRole(savedUser, ERole.ROLE_USER);
+        } else {
+            setRoles(savedUser, user.getRoles());
+        }
+        return savedUser;
     }
 
     @Override
@@ -71,17 +75,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (Objects.isNull(user.getId())) {
             user.setId(usernameOrEmailExistsCheck(user.getUsername(), user.getEmail()).getId());
         }
-        setRole(user);
-        return userDao.save(user);
+        User savedUser = userDao.save(user);
+        if(user.getRoles().isEmpty()) {
+            setRole(savedUser, ERole.ROLE_USER);
+        } else {
+            setRoles(savedUser, user.getRoles());
+        }
+        return savedUser;
     }
 
     @Override
     public User updateUser(UserOpenApi userOpenApi) {
-        return null;
+        User user = userMapper.toUser(userOpenApi);
+        return updateUser(user);
     }
     @Override
     public User updateUser(User user) {
-        return null;
+        return userDao.update(user);
     }
 
 
@@ -111,23 +121,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-
-    @Transactional
     private boolean usernameExistsCheck(String username) {
         return userDao.findByUsername(username).isPresent();
     }
 
-    @Transactional
     private boolean emailExistsCheck(String email) {
         return userDao.findByEmail(email).isPresent();
     }
 
-    @Transactional
-    private void setRole(User user) {
-        roleDao.findByName(ERole.ROLE_USER).ifPresentOrElse(
-                (role) -> user.setRoles(Set.of(role)),
-                () -> user.setRoles(Set.of(new Role(ERole.ROLE_USER)))
-        );
+    private void setRole(User user, ERole roleName) {
+        userDao.addRole(user.getId(), roleName);
+    }
+
+    private void setRoles(User user, Set<Role> roles) {
+        Set<ERole> roleNames = new HashSet<>();
+        roles.forEach(roleName -> roleNames.add(roleName.getName()));
+        userDao.addRoles(user.getId(), roleNames);
     }
 
 

@@ -19,6 +19,6 @@ public class UserParserSetting {
     private String tagName; // тэг, уточняющий класс
     private String cssSelectorNextPage; // CSS Selector кнопки переключения страниц
     private List<String> header;
-    private List<ElementLocator> parseSetting;
+    private List<ElementLocator> elementLocators;
     private OutputFileType outputFileType;
 }

@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import ru.researchser.openapi.model.ParserResultOpenApi;
 import ru.researchser.openapi.model.UserParserSettingsOpenApi;
 
-import java.util.List;
+import java.util.Set;
 
 public interface ParserService {
-    List<ParserResultOpenApi> getAllParserQueries();
+    Set<ParserResultOpenApi> getAllParserQueries();
 
     ParserResultOpenApi showParserResultsById(Long id);
 

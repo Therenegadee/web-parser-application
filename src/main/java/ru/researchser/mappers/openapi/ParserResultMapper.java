@@ -5,6 +5,7 @@ import ru.researchser.openapi.model.ParserResultOpenApi;
 import ru.researchser.models.ParserResult;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface ParserResultMapper {
@@ -13,4 +14,6 @@ public interface ParserResultMapper {
 
     List<ParserResult> toParserResult(List<ParserResultOpenApi> parserResultsOpenApi);
     List<ParserResultOpenApi> toOpenApi(List<ParserResult> parserResults);
+    Set<ParserResult> toParserResult(Set<ParserResultOpenApi> parserResultsOpenApi);
+    Set<ParserResultOpenApi> toOpenApi(Set<ParserResult> parserResults);
 }

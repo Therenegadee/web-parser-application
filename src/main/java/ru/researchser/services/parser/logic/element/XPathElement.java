@@ -14,13 +14,17 @@ import ru.researchser.models.ElementLocator;
 
 import java.time.Duration;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
 public class XPathElement extends ElementLocator implements ParseAlgorithm {
     @Autowired
     private WebDriver driver;
+
+    @Autowired
+    public XPathElement(WebDriver driver) {
+        this.driver = driver;
+    }
 
     @Override
     public String parseByParameters(ParseParameter abstractParseParameter, String url) {

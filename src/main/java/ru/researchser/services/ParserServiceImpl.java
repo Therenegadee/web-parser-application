@@ -1,6 +1,5 @@
 package ru.researchser.services;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.core.io.Resource;
@@ -24,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +36,11 @@ public class ParserServiceImpl implements ParserService {
     private final ParserResultDao parserResultDao;
 
     @Override
-    @Transactional
-    public List<ParserResultOpenApi> getAllParserQueries() {
+    public Set<ParserResultOpenApi> getAllParserQueries() {
         return parserResultMapper.toOpenApi(parserResultDao.findAll());
     }
 
     @Override
-    @Transactional
     public ParserResultOpenApi showParserResultsById(Long id) {
         Optional<ParserResult> parserResultOpt = parserResultDao.findById(id);
         if (parserResultOpt.isPresent()) {
@@ -54,7 +52,6 @@ public class ParserServiceImpl implements ParserService {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<Void> setParserSettings(UserParserSettingsOpenApi userParserSettingsOpenApi) {
         UserParserSetting userParserSettings = parserSettingsMapper.toUserParseSetting(userParserSettingsOpenApi);
         parseSettingRepository.save(userParserSettings);

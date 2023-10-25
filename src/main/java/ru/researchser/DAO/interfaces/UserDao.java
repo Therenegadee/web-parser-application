@@ -2,7 +2,9 @@ package ru.researchser.DAO.interfaces;
 
 import org.springframework.stereotype.Repository;
 import ru.researchser.models.ParserResult;
+import ru.researchser.models.Role;
 import ru.researchser.models.User;
+import ru.researchser.models.enums.ERole;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,13 @@ public interface UserDao {
 
     int deleteAll();
 
-    Boolean existsByUsername(String username);
+    Set<Role> addRole(Long userId, ERole roleName);
 
-    Boolean existsByEmail(String email);
+    Set<Role> addRoles(Long userId, Set<ERole> roleNames);
+
+    // Удалить роль
+    Set<Role> removeRole(Long userId, ERole roleName);
+    User removeAllRoles(Long userId);
+
+    Set<Role> getRolesByUserId(Long userId);
 }

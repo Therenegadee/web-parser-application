@@ -2,13 +2,12 @@ package ru.researchser.DAO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.researchser.DAO.interfaces.UserParserSettingsDao;
 import ru.researchser.models.UserParserSetting;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,12 +40,12 @@ public class UserParserSettingsJdbcTemplate implements UserParserSettingsDao {
     }
 
     @Override
-    public List<UserParserSetting> findAll() {
+    public Set<UserParserSetting> findAll() {
         return null;
     }
 
     @Override
-    public List<UserParserSetting> findAllByUserId(Long id) {
+    public Set<UserParserSetting> findAllByUserId(Long id) {
         return null;
     }
 

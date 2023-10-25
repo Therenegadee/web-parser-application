@@ -11,17 +11,15 @@ import java.util.Set;
 
 @Repository
 public interface RoleDao {
-    Optional<Role> findByName(ERole name);
+    Role findByName(ERole name);
+
     Set<Role> findAll();
+
     Set<Role> findAllByUserId(Long id);
+
     Role save(Role role);
 
     Role update(Role role);
-
-    Role updateById(Long id, Role role);
-    Set<Role> updateAll(Set<Role> roles);
-
-    int deleteById(Long id);
 
     int delete(Role role);
 

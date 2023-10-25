@@ -39,7 +39,7 @@ public class ParserRunner {
         String firstPageURL = userParserSetting.getFirstPageUrl(); // https://zhongchou.modian.com/all/top_comment/all/1
         driver.get(firstPageURL);
 
-        for (ElementLocator e : userParserSetting.getParseSetting()) {
+        for (ElementLocator e : userParserSetting.getElementLocators()) {
             parsingTypes.add(configuration.parseElement(e, driver));
         }
 

@@ -27,7 +27,6 @@ import ru.researchser.services.interfaces.UserService;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -70,10 +69,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private User checkActivationTokenIsValid(String activationToken) {
-        EmailToken token = emailTokenDao.findByToken(activationToken);
-        if (Objects.isNull(token)) {
-            throw new NotFoundException("The Link isn't Valid");
-        }
+        EmailToken token = emailTokenDao.findByToken(activationToken)
+                .orElseThrow(() -> new NotFoundException("The Link isn't Valid"));
         TokenType tokenType = token.getTokenType();
         Date tokenExpirationDate = token.getExpirationDate();
         Date currentDate = new Date();
