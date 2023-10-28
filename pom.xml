@@ -9,14 +9,15 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>ru</groupId>
-	<artifactId>researchser</artifactId>
+	<groupId>parser</groupId>
+	<artifactId>userService</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>researchser</name>
-	<description>Web Parser</description>
+	<description>User Service</description>
 
 	<properties>
 		<java.version>17</java.version>
+		<spring-cloud.version>2022.0.4</spring-cloud.version>
 	</properties>
 
 	<dependencies>
@@ -90,41 +91,6 @@
 			<version>0.11.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>4.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-http-jdk-client</artifactId>
-			<version>4.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.lingala.zip4j</groupId>
-			<artifactId>zip4j</artifactId>
-			<version>2.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>4.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>5.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.11.0</version>
-		</dependency>
-		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
@@ -179,7 +145,28 @@
 			<artifactId>lombok-mapstruct-binding</artifactId>
 			<version>0.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-feign</artifactId>
+			<version>1.4.7.RELEASE</version>
+		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 
 	<build>
 		<plugins>
@@ -229,8 +216,8 @@
 								./src/main/resources/openAPI/parser-api.openapi.yml
 							</inputSpec>
 							<generatorName>spring</generatorName>
-							<apiPackage>ru.researchser.openapi.api</apiPackage>
-							<modelPackage>ru.researchser.openapi.model</modelPackage>
+							<apiPackage>parser.userService.openapi.api</apiPackage>
+							<modelPackage>parser.userService.openapi.model</modelPackage>
 							<generateModelTests>false</generateModelTests>
 							<generateApiTests>false</generateApiTests>
 							<supportingFilesToGenerate>
