@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  title: Data Harvest Parser
+  version: 0.0.1
+servers:
+  - url: http://localhost:8082/api
+    description: Development Server
+
+paths:
+  /user/{id}:
+    get:
+      summary: User Info
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      operationId: showUserInfo
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOpenApi"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /auth/signup:
+    post:
+      summary: Register
+      tags:
+        - Authorization
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequestOpenApi'
+      responses:
+        '201':
+          description: User registered successfully and waits for email verification!
+        '400':
+          description: Account with such email is already in use!
+        '409':
+          description: Account with such username is already in use!
+
+  /auth/signin:
+    post:
+      summary: Login
+      tags:
+        - Authorization
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequestOpenApi"
+      responses:
+        '200':
+          description: Successfully Logged In
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwtResponseOpenApi"
+        '400':
+          description: Authentication error! Incorrect login/password input.
+
+  /auth/activation:
+    patch:
+      summary: Activation User account via Email
+      tags:
+        - Authorization
+      operationId: activateUser
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: true
+          description: The User crypto ID
+      responses:
+        '200':
+          description: Account was confirmed successfully
+        '400':
+          description: Account is already confirmed!
+        '404':
+          description: The link isn't valid. User with such user id not found.
+
+  /user/validate:
+    get:
+      summary: Validation of JWT
+      tags:
+        - User
+      operationId: validateToken
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: The JWT
+      responses:
+        '200':
+          description: Token is Valid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwtResponseOpenApi"
+        '400':
+          description: Token isn't Valid
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+
+  schemas:
+
+    UserOpenApi:
+      type: object
+      required:
+        - username
+        - email
+        - userStatus
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: object
+            $ref: "#/components/schemas/RoleOpenApi"
+        userStatus:
+          type: object
+          $ref: "#/components/schemas/UserStatusOpenApi"
+        userParseSettingsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        parserResultsIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        telegramUserId:
+          type: string
+
+    RoleOpenApi:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: object
+          $ref: "#/components/schemas/ERoleOpenApi"
+
+
+    ERoleOpenApi:
+      type: string
+      enum:
+        - ROLE_USER
+        - ROLE_ADMIN
+
+    UserStatusOpenApi:
+      type: string
+      enum:
+        - CONFIRMED_ACCOUNT
+        - WAIT_FOR_EMAIL_VERIFICATION
+
+    LoginRequestOpenApi:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    SignupRequestOpenApi:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    JwtResponseOpenApi:
+      type: object
+      required:
+        - id
+        - accessToken
+        - username
+      properties:
+        id:
+          type: integer
+          format: int64
+        accessToken:
+          type: string
+          pattern: ^Bearer\s.+$
+        username:
+          type: string
