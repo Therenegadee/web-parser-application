@@ -12,11 +12,12 @@ import org.springframework.stereotype.Component;
 import parser.userService.DAO.interfaces.UserDao;
 import parser.userService.mappers.openapi.UserMapper;
 import parser.userService.models.User;
-import parser.userService.openapi.model.JwtResponseOpenApi;
+import user.openapi.model.JwtResponseOpenApi;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -73,8 +74,12 @@ public class JwtUtils {
         User user = userOpt.get();
         JwtResponseOpenApi jwtResponseOpenApi = new JwtResponseOpenApi(
                 user.getId(),
+                generateJwtToken(user),
                 user.getUsername(),
-                generateJwtToken(user)
+                user.getRoles()
+                        .stream()
+                        .map(role -> role.getName().getValue())
+                        .collect(Collectors.toList())
         );
         return jwtResponseOpenApi;
     }

@@ -2,8 +2,8 @@ package parser.userService.mappers.openapi;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import parser.userService.openapi.model.UserOpenApi;
 import parser.userService.models.User;
+import user.openapi.model.UserOpenApi;
 
 import java.util.List;
 import java.util.Set;

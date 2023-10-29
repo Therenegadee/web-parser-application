@@ -1,7 +1,7 @@
 package parser.userService.mappers.openapi;
 
 import parser.userService.models.enums.ERole;
-import parser.userService.openapi.model.ERoleOpenApi;
+import user.openapi.model.ERoleOpenApi;
 
 public interface RoleMapper {
 

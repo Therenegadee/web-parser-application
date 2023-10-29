@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import parser.userService.openapi.api.UserApiDelegate;
-import parser.userService.openapi.model.JwtResponseOpenApi;
-import parser.userService.openapi.model.UserOpenApi;
 import parser.userService.services.interfaces.UserService;
+import user.openapi.api.UserApiDelegate;
+import user.openapi.model.JwtResponseOpenApi;
+import user.openapi.model.UserOpenApi;
 
 @RestController
 @RequestMapping("/api/user")

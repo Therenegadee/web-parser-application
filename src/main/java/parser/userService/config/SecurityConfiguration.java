@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import parser.userService.security.AuthTokenFilter;
 import parser.userService.security.AuthEntryPointJwt;
+import parser.userService.security.UserDetailsServiceImpl;
 import parser.userService.services.UserServiceImpl;
 import parser.userService.utils.CryptoUtil;
 
@@ -24,7 +25,7 @@ import parser.userService.utils.CryptoUtil;
 @EnableMethodSecurity
 public class SecurityConfiguration {
     @Autowired
-    private UserServiceImpl userServiceImpl;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
     @Autowired
     private AuthEntryPointJwt authEntryPointJwt;
     @Value("${mail-service.crypto-util.salt}")
@@ -38,7 +39,7 @@ public class SecurityConfiguration {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userServiceImpl);
+        authProvider.setUserDetailsService(userDetailsServiceImpl);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

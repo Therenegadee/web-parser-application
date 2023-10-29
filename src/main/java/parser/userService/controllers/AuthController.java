@@ -7,9 +7,11 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import parser.userService.openapi.api.AuthorizationApiDelegate;
 import parser.userService.services.interfaces.AuthService;
-import parser.userService.openapi.model.*;
+import user.openapi.api.AuthorizationApiDelegate;
+import user.openapi.model.JwtResponseOpenApi;
+import user.openapi.model.LoginRequestOpenApi;
+import user.openapi.model.SignupRequestOpenApi;
 
 @RestController
 @RequestMapping("/api/auth")

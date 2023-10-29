@@ -3,11 +3,10 @@ package parser.userService.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import parser.userService.DAO.interfaces.RoleDao;
+import parser.userService.DAO.interfaces.UserDao;
 import parser.userService.exceptions.BadRequestException;
 import parser.userService.exceptions.NotFoundException;
 import parser.userService.mappers.openapi.UserMapper;
@@ -15,13 +14,11 @@ import parser.userService.models.Role;
 import parser.userService.models.User;
 import parser.userService.models.enums.ActivationStatus;
 import parser.userService.models.enums.ERole;
-import parser.userService.openapi.model.JwtResponseOpenApi;
-import parser.userService.openapi.model.SignupRequestOpenApi;
-import parser.userService.openapi.model.UserOpenApi;
-import parser.userService.DAO.interfaces.RoleDao;
-import parser.userService.DAO.interfaces.UserDao;
 import parser.userService.security.JwtUtils;
 import parser.userService.services.interfaces.UserService;
+import user.openapi.model.JwtResponseOpenApi;
+import user.openapi.model.SignupRequestOpenApi;
+import user.openapi.model.UserOpenApi;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -30,7 +27,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Log4j
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final RoleDao roleDao;
@@ -47,13 +44,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ResponseEntity<UserOpenApi> showUserInfo(Long id) {
         return null;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userDao
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User with username: %s Not Found" + username));
     }
 
     @Override
