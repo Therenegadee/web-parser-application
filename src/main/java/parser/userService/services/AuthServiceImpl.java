@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import parser.userService.DAO.interfaces.EmailTokenDao;
 import parser.userService.exceptions.BadRequestException;
@@ -50,15 +51,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<JwtResponseOpenApi> authenticateUser(LoginRequestOpenApi loginRequest) {
-        User user = (User) userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+        User user = userService.findByUsername(loginRequest.getUsername());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        user.getUsername(),
-                        null,
-                        user.getRoles()
-                                .stream()
-                                .map(role -> new SimpleGrantedAuthority(role.getName().getValue()))
-                                .collect(Collectors.toList())));
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+//                        user.getRoles()
+//                                .stream()
+//                                .map(role -> new SimpleGrantedAuthority(role.getName().getValue()))
+//                                .collect(Collectors.toList())
+                                ));
         SecurityContextHolder
                 .getContext()
                 .setAuthentication(authentication);

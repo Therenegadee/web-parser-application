@@ -22,6 +22,7 @@ import user.openapi.model.UserOpenApi;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -53,12 +54,14 @@ public class UserServiceImpl implements UserService {
                 signUpRequest.getEmail(),
                 signUpRequest.getPassword());
         user.setActivationStatus(ActivationStatus.WAIT_FOR_EMAIL_VERIFICATION);
-        User savedUser = saveOrUpdateUser(user);
-        if(user.getRoles().isEmpty()) {
-            setRole(savedUser, ERole.ROLE_USER);
+        Set<Role> roles = user.getRoles();
+        if(roles.isEmpty()) {
+            roles.add(new Role(ERole.ROLE_USER));
+            user.setRoles(roles);
         } else {
-            setRoles(savedUser, user.getRoles());
+            user.setRoles(roles);
         }
+        User savedUser = saveOrUpdateUser(user);
         return savedUser;
     }
 
@@ -73,7 +76,14 @@ public class UserServiceImpl implements UserService {
             user.setPassword(encoder.encode(user.getPassword()));
         }
         if (Objects.isNull(user.getId())) {
-            user.setId(usernameOrEmailExistsCheck(user.getUsername(), user.getEmail()).getId());
+            Optional<User> userByUsernameOpt = userDao.findByUsername(user.getUsername());
+            if(userByUsernameOpt.isPresent()){
+                user.setId(userByUsernameOpt.get().getId());
+            }
+            Optional<User> userByEmailOpt = userDao.findByEmail(user.getEmail());
+            if(userByEmailOpt.isPresent()){
+                user.setId(userByEmailOpt.get().getId());
+            }
         }
         User savedUser = userDao.save(user);
         if(user.getRoles().isEmpty()) {
@@ -94,6 +104,17 @@ public class UserServiceImpl implements UserService {
         return userDao.update(user);
     }
 
+    @Override
+    public User findByUsername(String username) {
+        User user = userDao.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException(String.format("User with username %s wasn't found", username)));
+        Set<Role> roles = roleDao.findAllByUserId(user.getId());
+        if(roles.isEmpty()) {
+            throw new NotFoundException(String.format("User with id %d doesn't have any Role", user.getId()));
+        }
+        user.setRoles(roles);
+        return user;
+    }
 
     public void checkUserAlreadyExists(SignupRequestOpenApi signUpRequest) {
         if (usernameExistsCheck(signUpRequest.getUsername())) {
@@ -103,21 +124,6 @@ public class UserServiceImpl implements UserService {
         if (emailExistsCheck(signUpRequest.getEmail())) {
             throw new BadRequestException(String.format(
                     "User with email %s already exists!", signUpRequest.getEmail()));
-        }
-    }
-
-    private User usernameOrEmailExistsCheck(String username, String email) {
-        if (usernameExistsCheck(username)) {
-            return userDao.findByUsername(username).get();
-        } else if (!usernameExistsCheck(username)){
-            throw new NotFoundException(String.format(
-                    "User with username %s wasn't not found!", username));
-        }
-        if (emailExistsCheck(email)) {
-            return userDao.findByEmail(email).get();
-        } else {
-            throw new BadRequestException(String.format(
-                    "User with email %s wasn't not found!", email));
         }
     }
 
@@ -138,7 +144,5 @@ public class UserServiceImpl implements UserService {
         roles.forEach(roleName -> roleNames.add(roleName.getName()));
         userDao.addRoles(user.getId(), roleNames);
     }
-
-
 
 }

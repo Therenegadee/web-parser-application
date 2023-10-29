@@ -21,4 +21,6 @@ public interface UserService {
     User updateUser(User user);
 
     User updateUser(UserOpenApi userOpenApi);
+
+    User findByUsername(String username);
 }
