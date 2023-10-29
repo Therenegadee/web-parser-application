@@ -57,10 +57,6 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()
-//                        user.getRoles()
-//                                .stream()
-//                                .map(role -> new SimpleGrantedAuthority(role.getName().getValue()))
-//                                .collect(Collectors.toList())
                                 ));
         SecurityContextHolder
                 .getContext()
