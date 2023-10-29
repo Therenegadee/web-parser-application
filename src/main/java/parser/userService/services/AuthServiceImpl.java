@@ -51,7 +51,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<JwtResponseOpenApi> authenticateUser(LoginRequestOpenApi loginRequest) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
         User user = userService.findByUsername(loginRequest.getUsername());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
