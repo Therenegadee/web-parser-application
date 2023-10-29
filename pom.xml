@@ -213,11 +213,11 @@
 						</goals>
 						<configuration>
 							<inputSpec>
-								./src/main/resources/openAPI/parser-api.openapi.yml
+								./src/main/resources/openAPI/user-api.openapi.yml
 							</inputSpec>
 							<generatorName>spring</generatorName>
-							<apiPackage>parser.userService.openapi.api</apiPackage>
-							<modelPackage>parser.userService.openapi.model</modelPackage>
+							<apiPackage>user.openapi.api</apiPackage>
+							<modelPackage>user.openapi.model</modelPackage>
 							<generateModelTests>false</generateModelTests>
 							<generateApiTests>false</generateApiTests>
 							<supportingFilesToGenerate>

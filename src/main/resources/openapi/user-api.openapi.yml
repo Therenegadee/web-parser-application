@@ -3,7 +3,7 @@ info:
   title: Data Harvest Parser
   version: 0.0.1
 servers:
-  - url: http://localhost:8082/api
+  - url: http://localhost:8081/api
     description: Development Server
 
 paths:
@@ -74,7 +74,7 @@ paths:
           description: Authentication error! Incorrect login/password input.
 
   /auth/activation:
-    patch:
+    put:
       summary: Activation User account via Email
       tags:
         - Authorization
@@ -222,6 +222,7 @@ components:
         - id
         - accessToken
         - username
+        - roles
       properties:
         id:
           type: integer
@@ -231,3 +232,7 @@ components:
           pattern: ^Bearer\s.+$
         username:
           type: string
+        roles:
+          type: array
+          items:
+            type: string

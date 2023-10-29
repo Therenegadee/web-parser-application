@@ -5,16 +5,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import parser.userService.DAO.interfaces.UserDao;
+import parser.userService.services.interfaces.UserService;
 
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserDao userDao;
+    private final UserService userService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userDao
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User with username: %s Not Found" + username));
+        return userService.findByUsername(username);
     }
 }

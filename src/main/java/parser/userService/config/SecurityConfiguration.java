@@ -1,6 +1,6 @@
 package parser.userService.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,16 +18,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import parser.userService.security.AuthTokenFilter;
 import parser.userService.security.AuthEntryPointJwt;
 import parser.userService.security.UserDetailsServiceImpl;
-import parser.userService.services.UserServiceImpl;
 import parser.userService.utils.CryptoUtil;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
-    @Autowired
-    private AuthEntryPointJwt authEntryPointJwt;
+    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final AuthEntryPointJwt authEntryPointJwt;
     @Value("${mail-service.crypto-util.salt}")
     private String salt;
 
@@ -66,12 +64,9 @@ public class SecurityConfiguration {
                                         "/api/auth/**",
                                         "/api/test/**",
                                         "/api/parser/**",
-                                        "/api/telegram/auth/**"
+                                        "/api/telegram/auth/**",
+                                        "/api/user/**"
                                 )
-                        .permitAll()
-                        .requestMatchers("/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
