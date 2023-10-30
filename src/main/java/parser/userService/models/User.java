@@ -4,13 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import parser.userService.models.enums.ActivationStatus;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -18,7 +14,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements UserDetails {
+public class User {
     private Long id;
     @NotBlank
     @Size(max = 20)
@@ -33,7 +29,6 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
     private ActivationStatus activationStatus;
     private String telegramUserId;
-    private Collection<? extends GrantedAuthority> authorities;
 
     public User (String username, String email, String password) {
         this.username = username;
@@ -41,25 +36,6 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
 
 }

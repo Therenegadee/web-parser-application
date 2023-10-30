@@ -1,4 +1,4 @@
-package parser.userService.security;
+package parser.userService.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

@@ -1,16 +1,13 @@
 package parser.userService.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import parser.userService.models.User;
-import user.openapi.model.JwtResponseOpenApi;
 import user.openapi.model.SignupRequestOpenApi;
 import user.openapi.model.UserOpenApi;
 
 public interface UserService {
     ResponseEntity<UserOpenApi> showUserInfo(Long id);
-
-    ResponseEntity<JwtResponseOpenApi> validateJwtToken(String jwtToken);
+    ResponseEntity<UserOpenApi> showUserInfo(String username);
 
     User saveOrUpdateUser(SignupRequestOpenApi signUpRequest);
 

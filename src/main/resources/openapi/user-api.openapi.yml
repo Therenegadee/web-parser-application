@@ -9,7 +9,7 @@ servers:
 paths:
   /user/{id}:
     get:
-      summary: User Info
+      summary: User Info by Id
       tags:
         - User
       parameters:
@@ -20,7 +20,29 @@ paths:
             type: integer
             format: int64
             minimum: 1
-      operationId: showUserInfo
+      operationId: showUserInfoById
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOpenApi"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+  /user/{username}:
+    get:
+      summary: User Info by Username
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      operationId: showUserInfoByUsername
       responses:
         '200':
           description: OK
@@ -93,29 +115,6 @@ paths:
           description: Account is already confirmed!
         '404':
           description: The link isn't valid. User with such user id not found.
-
-  /user/validate:
-    get:
-      summary: Validation of JWT
-      tags:
-        - User
-      operationId: validateToken
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-          required: true
-          description: The JWT
-      responses:
-        '200':
-          description: Token is Valid
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/JwtResponseOpenApi"
-        '400':
-          description: Token isn't Valid
 
 components:
 

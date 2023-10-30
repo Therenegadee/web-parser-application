@@ -4,12 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import parser.userService.DAO.interfaces.EmailTokenDao;
 import parser.userService.exceptions.BadRequestException;
@@ -18,10 +12,9 @@ import parser.userService.models.EmailToken;
 import parser.userService.models.User;
 import parser.userService.models.enums.ActivationStatus;
 import parser.userService.models.enums.TokenType;
-import parser.userService.security.JwtUtils;
-import parser.userService.security.UserDetailsServiceImpl;
 import parser.userService.services.interfaces.AuthService;
 import parser.userService.services.interfaces.UserService;
+import parser.userService.utils.JwtUtils;
 import user.openapi.model.JwtResponseOpenApi;
 import user.openapi.model.LoginRequestOpenApi;
 import user.openapi.model.SignupRequestOpenApi;
@@ -33,8 +26,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j
 public class AuthServiceImpl implements AuthService {
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsServiceImpl userDetailsService;
     private final UserService userService;
     private final JwtUtils jwtUtils;
     private final MailSenderService senderService;
@@ -52,14 +43,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<JwtResponseOpenApi> authenticateUser(LoginRequestOpenApi loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                                ));
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
+        if(!loginRequest.getPassword().equals(user.getPassword())) {
+            throw new BadRequestException("Invalid Password");
+        }
         return ResponseEntity
                 .ok(generateAuthToken(user));
     }

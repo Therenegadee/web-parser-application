@@ -1,7 +1,6 @@
 package parser.userService.mappers.openapi;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import parser.userService.models.User;
 import user.openapi.model.UserOpenApi;
 

@@ -3,7 +3,6 @@ package parser.userService.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import parser.userService.DAO.interfaces.RoleDao;
@@ -15,9 +14,7 @@ import parser.userService.models.Role;
 import parser.userService.models.User;
 import parser.userService.models.enums.ActivationStatus;
 import parser.userService.models.enums.ERole;
-import parser.userService.security.JwtUtils;
 import parser.userService.services.interfaces.UserService;
-import user.openapi.model.JwtResponseOpenApi;
 import user.openapi.model.SignupRequestOpenApi;
 import user.openapi.model.UserOpenApi;
 
@@ -34,18 +31,19 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleDao roleDao;
     private final PasswordEncoder encoder;
-    private final JwtUtils jwtUtils;
-
-
-    @Override
-    public ResponseEntity<JwtResponseOpenApi> validateJwtToken(String jwtToken) {
-        return ResponseEntity
-                .ok(jwtUtils.validateToken(jwtToken));
-    }
 
     @Override
     public ResponseEntity<UserOpenApi> showUserInfo(Long id) {
-        return null;
+        User user = userDao.findById(id)
+                .orElseThrow(()->new NotFoundException(String.format("user with id %d wasn't found", id)));
+        return ResponseEntity.ok(userMapper.toOpenApi(user));
+    }
+
+    @Override
+    public ResponseEntity<UserOpenApi> showUserInfo(String username) {
+        User user = userDao.findByUsername(username)
+                .orElseThrow(()->new NotFoundException(String.format("user with id %s wasn't found", username)));
+        return ResponseEntity.ok(userMapper.toOpenApi(user));
     }
 
     @Override
