@@ -23,7 +23,7 @@ public class MailSenderService {
         String subject = "Email address confirmation";
         String messageBody = String.format("Для подтверждения Ваше электронной почты и " +
                         "активации аккаунта необходимо перейти по ссылке %s", activationUri);
-        messageBody = messageBody.replace("{id}", emailToken.getToken());
+        messageBody = messageBody.replace("{activationToken}", emailToken.getToken());
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 

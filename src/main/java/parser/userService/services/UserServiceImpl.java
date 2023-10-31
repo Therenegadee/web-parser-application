@@ -3,7 +3,6 @@ package parser.userService.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import parser.userService.DAO.interfaces.RoleDao;
 import parser.userService.DAO.interfaces.UserDao;
@@ -30,7 +29,6 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final RoleDao roleDao;
-    private final PasswordEncoder encoder;
 
     @Override
     public ResponseEntity<UserOpenApi> showUserInfo(Long id) {
@@ -60,8 +58,7 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setRoles(roles);
         }
-        User savedUser = saveOrUpdateUser(user);
-        return savedUser;
+        return saveOrUpdateUser(user);
     }
 
     @Override
@@ -71,18 +68,14 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public User saveOrUpdateUser(User user) {
-        if (Objects.nonNull(user.getPassword())) {
-            user.setPassword(encoder.encode(user.getPassword()));
+        if(Objects.nonNull(user.getPassword())) {
+            user.setPassword(user.getPassword());
         }
         if (Objects.isNull(user.getId())) {
             Optional<User> userByUsernameOpt = userDao.findByUsername(user.getUsername());
-            if(userByUsernameOpt.isPresent()){
-                user.setId(userByUsernameOpt.get().getId());
-            }
+            userByUsernameOpt.ifPresent(value -> user.setId(value.getId()));
             Optional<User> userByEmailOpt = userDao.findByEmail(user.getEmail());
-            if(userByEmailOpt.isPresent()){
-                user.setId(userByEmailOpt.get().getId());
-            }
+            userByEmailOpt.ifPresent(value -> user.setId(value.getId()));
         }
         User savedUser = userDao.save(user);
         if(user.getRoles().isEmpty()) {

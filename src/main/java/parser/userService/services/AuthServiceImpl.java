@@ -1,7 +1,12 @@
 package parser.userService.services;
 
+import com.password4j.BcryptFunction;
+import com.password4j.Hash;
+import com.password4j.Password;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,14 +30,19 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Log4j
+@PropertySource(value = "classpath:application.yml")
 public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final JwtUtils jwtUtils;
     private final MailSenderService senderService;
     private final EmailTokenDao emailTokenDao;
-
+    private final BcryptFunction bcrypt;
+    @Value("${crypto-util.pepper}")
+    private String pepper;
     @Override
     public ResponseEntity<Void> registerUser(SignupRequestOpenApi signUpRequest) {
+        String password = encryptPassword(signUpRequest.getPassword());
+        signUpRequest.setPassword(password);
         User user = userService.saveOrUpdateUser(signUpRequest);
         senderService.sendVerificationEmail(user.getEmail(), new EmailToken(user));
         return ResponseEntity
@@ -43,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<JwtResponseOpenApi> authenticateUser(LoginRequestOpenApi loginRequest) {
         User user = userService.findByUsername(loginRequest.getUsername());
-        if(!loginRequest.getPassword().equals(user.getPassword())) {
+        if(!passwordIsCorrect(loginRequest.getPassword(), user.getPassword())) {
             throw new BadRequestException("Invalid Password");
         }
         return ResponseEntity
@@ -59,6 +69,19 @@ public class AuthServiceImpl implements AuthService {
                 .ok()
                 .build();
 
+    }
+
+    private String encryptPassword(String password){
+        Hash hash = Password.hash(password)
+                .addPepper(pepper)
+                .with(bcrypt);
+        return hash.getResult();
+    }
+
+    private boolean passwordIsCorrect(String dbPassword, String inputPassword){
+        return Password.check(dbPassword, inputPassword)
+                .addPepper(pepper)
+                .with(bcrypt);
     }
 
     private User checkActivationTokenIsValid(String activationToken) {

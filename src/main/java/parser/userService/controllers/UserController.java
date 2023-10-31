@@ -1,7 +1,6 @@
 package parser.userService.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,7 +10,6 @@ import user.openapi.model.UserOpenApi;
 
 @RestController
 @RequestMapping("/api/user")
-@FeignClient("user-service")
 @RequiredArgsConstructor
 public class UserController implements UserApiDelegate {
     private final UserService userService;

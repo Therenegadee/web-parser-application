@@ -3,7 +3,6 @@ package parser.userService.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import parser.userService.services.interfaces.AuthService;
@@ -15,7 +14,6 @@ import user.openapi.model.SignupRequestOpenApi;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
-@FeignClient("auth-service")
 @RequiredArgsConstructor
 @Log4j
 public class AuthController implements AuthorizationApiDelegate {
