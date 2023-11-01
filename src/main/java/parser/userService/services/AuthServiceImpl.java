@@ -3,6 +3,7 @@ package parser.userService.services;
 import com.password4j.BcryptFunction;
 import com.password4j.Hash;
 import com.password4j.Password;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ import user.openapi.model.SignupRequestOpenApi;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+@Observed
 @Service
 @RequiredArgsConstructor
 @Log4j

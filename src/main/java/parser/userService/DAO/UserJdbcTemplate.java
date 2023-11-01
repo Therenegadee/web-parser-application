@@ -1,10 +1,12 @@
 package parser.userService.DAO;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import parser.userService.DAO.interfaces.RoleDao;
 import parser.userService.DAO.interfaces.UserDao;
 import parser.userService.exceptions.NotFoundException;
@@ -18,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
 
+@Observed
 @Repository
 @RequiredArgsConstructor
 public class UserJdbcTemplate implements UserDao {
@@ -26,6 +29,7 @@ public class UserJdbcTemplate implements UserDao {
     private final RoleDao roleDao;
     private final RoleRowMapper roleMapper;
 
+    @Transactional
     @Override
     public Optional<User> findById(Long id) {
         String query = "SELECT * FROM users WHERE id=?";
@@ -35,6 +39,7 @@ public class UserJdbcTemplate implements UserDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Optional<User> findByUsername(String username) {
         String query = "SELECT * FROM users WHERE username=?";
@@ -44,6 +49,7 @@ public class UserJdbcTemplate implements UserDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Optional<User> findByEmail(String email) {
         String query = "SELECT * FROM users WHERE email=?";
@@ -53,6 +59,7 @@ public class UserJdbcTemplate implements UserDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Optional<User> findByTelegramId(String telegramId) {
         String query = "SELECT * FROM users WHERE telegram_id=?";
@@ -62,12 +69,14 @@ public class UserJdbcTemplate implements UserDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Set<User> findAll() {
         String query = "SELECT * FROM users";
         return new HashSet<>(jdbcTemplate.query(query, userMapper));
     }
 
+    @Transactional
     @Override
     public User save(User user) {
         if (Objects.isNull(user)) throw new IllegalArgumentException("User is Null!");
@@ -93,6 +102,7 @@ public class UserJdbcTemplate implements UserDao {
         return savedUser;
     }
 
+    @Transactional
     @Override
     public User update(User user) {
         if (Objects.isNull(user)) throw new IllegalArgumentException("User is Null!");
@@ -100,6 +110,7 @@ public class UserJdbcTemplate implements UserDao {
         return updateById(id, user);
     }
 
+    @Transactional
     @Override
     public User updateById(Long id, User user) {
         if (Objects.isNull(user)) throw new IllegalArgumentException("User is Null!");
@@ -117,6 +128,7 @@ public class UserJdbcTemplate implements UserDao {
         }
     }
 
+    @Transactional
     @Override
     public int deleteById(Long id) {
         if (Objects.nonNull(id) && findById(id).isPresent()) {
@@ -127,6 +139,7 @@ public class UserJdbcTemplate implements UserDao {
         }
     }
 
+    @Transactional
     @Override
     public int delete(User user) {
         if (Objects.isNull(user)) throw new IllegalArgumentException("User is Null!");
@@ -134,12 +147,14 @@ public class UserJdbcTemplate implements UserDao {
         return deleteById(id);
     }
 
+    @Transactional
     @Override
     public int deleteAll() {
         String query = "DELETE FROM users";
         return jdbcTemplate.update(query);
     }
 
+    @Transactional
     @Override
     public Set<Role> addRole(Long userId, ERole roleName) {
         Optional<User> user = findById(userId);
@@ -153,6 +168,7 @@ public class UserJdbcTemplate implements UserDao {
         }
     }
 
+    @Transactional
     @Override
     public Set<Role> addRoles(Long userId, Set<ERole> roleNames) {
         Optional<User> user = findById(userId);
@@ -171,6 +187,7 @@ public class UserJdbcTemplate implements UserDao {
         }
     }
 
+    @Transactional
     @Override
     public Set<Role> removeRole(Long userId, ERole roleName) {
         Optional<User> user = findById(userId);
@@ -184,6 +201,7 @@ public class UserJdbcTemplate implements UserDao {
         }
     }
 
+    @Transactional
     @Override
     public User removeAllRoles(Long userId) {
         Optional<User> user = findById(userId);
@@ -195,6 +213,7 @@ public class UserJdbcTemplate implements UserDao {
         throw new NotFoundException(String.format("User with id %d wasn't found", userId));
     }
 
+    @Transactional
     @Override
     public Set<Role> getRolesByUserId(Long userId) {
         if(userId != null && findById(userId).isPresent()) {

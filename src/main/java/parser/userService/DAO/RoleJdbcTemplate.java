@@ -1,8 +1,10 @@
 package parser.userService.DAO;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import parser.userService.DAO.interfaces.RoleDao;
 import parser.userService.exceptions.BadRequestException;
 import parser.userService.exceptions.NotFoundException;
@@ -14,12 +16,14 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Observed
 @Repository
 @RequiredArgsConstructor
 public class RoleJdbcTemplate implements RoleDao {
     private final JdbcTemplate jdbcTemplate;
     private final RoleRowMapper roleMapper;
 
+    @Transactional
     @Override
     public Role findByName(ERole name) {
         String query = "SELECT * FROM roles WHERE name=?";
@@ -30,6 +34,7 @@ public class RoleJdbcTemplate implements RoleDao {
                 .orElseThrow(() -> new NotFoundException(String.format("Role with name %s doesn't exist", name.getValue())));
     }
 
+    @Transactional
     @Override
     public Set<Role> findAll() {
         String query = "SELECT * FROM roles";
@@ -48,6 +53,7 @@ public class RoleJdbcTemplate implements RoleDao {
         }
     }
 
+    @Transactional
     @Override
     public Role save(Role role) {
         if (Objects.isNull(role)) throw new IllegalArgumentException("Parser Result is Null!");
@@ -63,6 +69,7 @@ public class RoleJdbcTemplate implements RoleDao {
         return findByName(role.getName());
     }
 
+    @Transactional
     @Override
     public Role update(Role role) {
         if (Objects.isNull(role)) throw new IllegalArgumentException("Role is Null!");
@@ -80,6 +87,7 @@ public class RoleJdbcTemplate implements RoleDao {
         }
     }
 
+    @Transactional
     @Override
     public int delete(Role role) {
         if (Objects.nonNull(role) && findByName(role.getName()) != null) {
@@ -91,6 +99,7 @@ public class RoleJdbcTemplate implements RoleDao {
         }
     }
 
+    @Transactional
     @Override
     public int deleteAll() {
         String query = "DELETE FROM roles";

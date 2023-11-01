@@ -1,5 +1,6 @@
 package parser.userService.services;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@Observed
 @Service
 @RequiredArgsConstructor
 @Log4j

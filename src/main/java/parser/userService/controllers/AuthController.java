@@ -1,5 +1,6 @@
 package parser.userService.controllers;
 
+import io.micrometer.observation.annotation.Observed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
@@ -11,6 +12,7 @@ import user.openapi.model.JwtResponseOpenApi;
 import user.openapi.model.LoginRequestOpenApi;
 import user.openapi.model.SignupRequestOpenApi;
 
+@Observed
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")

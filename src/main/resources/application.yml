@@ -30,6 +30,35 @@ spring:
         sender:
           email: uparse.confirmation@yandex.ru
 
+logging:
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.type.descriptor.sql: TRACE
+
+management:
+  tracing:
+    sampling:
+      probability: 1
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  zipkin:
+    tracing:
+      endpoint: http://${TEMPO_HOST:localhost}:${TEMPO_PORT:9411}/api/v2/spans
+
 jwt:
   jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
   jwtExpirationMs: 7200000

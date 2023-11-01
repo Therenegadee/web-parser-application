@@ -1,10 +1,12 @@
 package parser.userService.DAO;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import parser.userService.DAO.interfaces.EmailTokenDao;
 import parser.userService.exceptions.NotFoundException;
 import parser.userService.mappers.jdbc.EmailTokenRowMapper;
@@ -19,12 +21,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@Observed
 @Repository
 @RequiredArgsConstructor
 public class EmailTokenJdbcTemplate implements EmailTokenDao {
     private final JdbcTemplate jdbcTemplate;
     private final EmailTokenRowMapper tokenMapper;
 
+    @Transactional
     @Override
     public Optional<EmailToken> findByToken(String token) {
         String query = "SELECT * FROM email_tokens WHERE token=?";
@@ -34,6 +38,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Optional<EmailToken> findById(Long id) {
         String query = "SELECT * FROM email_tokens WHERE id=?";
@@ -43,12 +48,14 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
                 .findAny();
     }
 
+    @Transactional
     @Override
     public Set<EmailToken> findAll() {
         String query = "SELECT * FROM email_tokens";
         return new HashSet<>(jdbcTemplate.query(query, tokenMapper));
     }
 
+    @Transactional
     @Override
     public EmailToken save(EmailToken emailToken) {
         if (Objects.isNull(emailToken)) throw new IllegalArgumentException("Email Token is Null!");
@@ -72,6 +79,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
                 .orElseThrow(() -> new RuntimeException("Email Token doesn't exist"));
     }
 
+    @Transactional
     @Override
     public EmailToken update(EmailToken emailToken) {
         if (Objects.isNull(emailToken)) throw new IllegalArgumentException("Email Token is Null!");
@@ -79,6 +87,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
         return updateById(id, emailToken);
     }
 
+    @Transactional
     @Override
     public EmailToken updateById(Long id, EmailToken emailToken) {
         if (Objects.isNull(emailToken)) throw new IllegalArgumentException("Email Token is Null!");
@@ -97,6 +106,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
         }
     }
 
+    @Transactional
     @Override
     public int deleteById(Long id) {
         if (Objects.nonNull(id) && findById(id).isPresent()) {
@@ -107,6 +117,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
         }
     }
 
+    @Transactional
     @Override
     public int delete(EmailToken emailToken) {
         if (Objects.isNull(emailToken)) throw new IllegalArgumentException("EmailToken is Null!");
@@ -114,7 +125,7 @@ public class EmailTokenJdbcTemplate implements EmailTokenDao {
         return deleteById(id);
     }
 
-
+    @Transactional
     @Override
     public int deleteAllExpired(Date date) {
         String query = "DELETE FROM email_tokens " +
