@@ -2,7 +2,6 @@ package parser.userService.services;
 
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import parser.userService.DAO.interfaces.RoleDao;
@@ -26,13 +25,13 @@ import java.util.Set;
 @Observed
 @Service
 @RequiredArgsConstructor
-@Log4j
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final RoleDao roleDao;
 
     @Override
+    @Observed
     public ResponseEntity<UserOpenApi> showUserInfo(Long id) {
         User user = userDao.findById(id)
                 .orElseThrow(()->new NotFoundException(String.format("user with id %d wasn't found", id)));
@@ -40,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Observed
     public ResponseEntity<UserOpenApi> showUserInfo(String username) {
         User user = userDao.findByUsername(username)
                 .orElseThrow(()->new NotFoundException(String.format("user with id %s wasn't found", username)));
@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Observed
     public User saveOrUpdateUser(SignupRequestOpenApi signUpRequest) {
         checkUserAlreadyExists(signUpRequest);
         User user = new User(signUpRequest.getUsername(),
@@ -64,11 +65,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Observed
     public User saveOrUpdateUser(UserOpenApi userOpenApi) {
         User user = userMapper.toUser(userOpenApi);
         return saveOrUpdateUser(user);
     }
     @Override
+    @Observed
     public User saveOrUpdateUser(User user) {
         if(Objects.nonNull(user.getPassword())) {
             user.setPassword(user.getPassword());
@@ -89,16 +92,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Observed
     public User updateUser(UserOpenApi userOpenApi) {
         User user = userMapper.toUser(userOpenApi);
         return updateUser(user);
     }
     @Override
+    @Observed
     public User updateUser(User user) {
         return userDao.update(user);
     }
 
     @Override
+    @Observed
     public User findByUsername(String username) {
         User user = userDao.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException(String.format("User with username %s wasn't found", username)));

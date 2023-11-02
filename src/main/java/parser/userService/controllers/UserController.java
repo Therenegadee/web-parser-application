@@ -10,7 +10,6 @@ import parser.userService.services.interfaces.UserService;
 import user.openapi.api.UserApiDelegate;
 import user.openapi.model.UserOpenApi;
 
-@Observed
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -18,11 +17,13 @@ public class UserController implements UserApiDelegate {
     private final UserService userService;
 
     @Override
+    @Observed
     public ResponseEntity<UserOpenApi> showUserInfoById(Long id) {
         return userService.showUserInfo(id);
     }
 
     @Override
+    @Observed
     public ResponseEntity<UserOpenApi> showUserInfoByUsername(String username) {
         return userService.showUserInfo(username);
     }

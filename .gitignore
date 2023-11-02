@@ -1,5 +1,5 @@
 HELP.md
-/Users/aye/Desktop/projects/web-parser-application1/src/main/resources/application.yml
+./src/main/resources/application.yml
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -33,3 +33,5 @@ build/
 ### VS Code ###
 .vscode/
 !/src/main/resources/application.yml
+!/jar/user-service-1.0.jar
+/jar/user-service-1.0.jar
