@@ -42,7 +42,7 @@ public class UserJdbcTemplate implements UserDao {
     @Transactional
     @Override
     public Optional<User> findByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username=?";
+        String query = "SELECT * FROM users WHERE username = ?";
         return jdbcTemplate
                 .query(query, userMapper, username)
                 .stream()
@@ -225,27 +225,4 @@ public class UserJdbcTemplate implements UserDao {
         throw new NotFoundException(String.format("User with id %d wasn't found", userId));
     }
 
-
-//    private void processParserResults(User user, User savedUser) {
-//        List<ParserResult> parserResults = user.getParserResults();
-//        parserResults
-//                .forEach(result -> {
-//                    result.setUser(savedUser);
-//                    if (Objects.nonNull(result.getUserParserSettings())) {
-//                        processParserSettings(result);
-//                    }
-//                    parserResultDao.save(result);
-//                });
-//    }
-//
-//    private void processParserSettings(ParserResult result) {
-//        UserParserSetting savedUserParserSetting = parserSettingsDao.save(result.getUserParserSettings());
-//        result.getUserParserSettings()
-//                .getElementLocators()
-//                .forEach(elementLocator -> {
-//                    elementLocator.setUserParserSetting(savedUserParserSetting);
-//                    elementLocatorDao.save(elementLocator);
-//                });
-//        result.setUserParserSettings(savedUserParserSetting);
-//    }
 }

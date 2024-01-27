@@ -7,13 +7,13 @@ server:
 spring:
   application:
     name: user-service
-#  sql:
-#    init:
-#      mode: always
+  #  sql:
+  #    init:
+  #      mode: always
   datasource:
     username: user_service
     password: user_service
-    url: jdbc:postgresql://db-parser:5432/user_service
+    url: jdbc:postgresql://db-postgres:5432/user_service
   mail:
     host: smtp.yandex.ru
     port: 465

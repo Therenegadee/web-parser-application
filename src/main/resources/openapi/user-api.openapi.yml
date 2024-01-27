@@ -7,7 +7,7 @@ servers:
     description: Development Server
 
 paths:
-  /user/{id}:
+  /user/id/{id}:
     get:
       summary: User Info by Id
       tags:
@@ -30,7 +30,7 @@ paths:
                 $ref: "#/components/schemas/UserOpenApi"
         '401':
           $ref: "#/components/responses/UnauthorizedError"
-  /user/{username}:
+  /user/username/{username}:
     get:
       summary: User Info by Username
       tags:

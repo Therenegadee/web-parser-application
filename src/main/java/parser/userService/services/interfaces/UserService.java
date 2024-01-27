@@ -6,8 +6,8 @@ import user.openapi.model.SignupRequestOpenApi;
 import user.openapi.model.UserOpenApi;
 
 public interface UserService {
-    ResponseEntity<UserOpenApi> showUserInfo(Long id);
-    ResponseEntity<UserOpenApi> showUserInfo(String username);
+    User showUserInfo(Long id);
+    User showUserInfo(String username);
 
     User saveOrUpdateUser(SignupRequestOpenApi signUpRequest);
 

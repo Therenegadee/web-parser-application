@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Observed
 @Service
@@ -32,18 +33,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Observed
-    public ResponseEntity<UserOpenApi> showUserInfo(Long id) {
+    public User showUserInfo(Long id) {
         User user = userDao.findById(id)
                 .orElseThrow(()->new NotFoundException(String.format("user with id %d wasn't found", id)));
-        return ResponseEntity.ok(userMapper.toOpenApi(user));
+        userDao.getRolesByUserId(id);
+        return user;
     }
 
     @Override
     @Observed
-    public ResponseEntity<UserOpenApi> showUserInfo(String username) {
+    public User showUserInfo(String username) {
         User user = userDao.findByUsername(username)
                 .orElseThrow(()->new NotFoundException(String.format("user with id %s wasn't found", username)));
-        return ResponseEntity.ok(userMapper.toOpenApi(user));
+        user.setRoles(userDao.getRolesByUserId(user.getId()));
+
+        return user;
     }
 
     @Override
@@ -54,13 +58,7 @@ public class UserServiceImpl implements UserService {
                 signUpRequest.getEmail(),
                 signUpRequest.getPassword());
         user.setActivationStatus(ActivationStatus.WAIT_FOR_EMAIL_VERIFICATION);
-        Set<Role> roles = user.getRoles();
-        if(roles.isEmpty()) {
-            roles.add(new Role(ERole.ROLE_USER));
-            user.setRoles(roles);
-        } else {
-            user.setRoles(roles);
-        }
+        user.getRoles().add(new Role(ERole.ROLE_USER));
         return saveOrUpdateUser(user);
     }
 
@@ -85,8 +83,13 @@ public class UserServiceImpl implements UserService {
         User savedUser = userDao.save(user);
         if(user.getRoles().isEmpty()) {
             setRole(savedUser, ERole.ROLE_USER);
+            userDao.addRole(user.getId(), user.getRoles().stream().findFirst().get().getName());
         } else {
-            setRoles(savedUser, user.getRoles());
+            Set<Role> roles = userDao.getRolesByUserId(user.getId());
+            if(user.getRoles().equals(roles)) {
+                userDao.removeAllRoles(user.getId());
+                setRoles(savedUser, roles);
+            }
         }
         return savedUser;
     }

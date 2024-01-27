@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Observed
     public ResponseEntity<JwtResponseOpenApi> authenticateUser(LoginRequestOpenApi loginRequest) {
-        User user = userService.findByUsername(loginRequest.getUsername());
+        User user = userService.showUserInfo(loginRequest.getUsername());
         if(!passwordIsCorrect(loginRequest.getPassword(), user.getPassword())) {
             throw new BadRequestException("Invalid Password");
         }
@@ -119,4 +119,5 @@ public class AuthServiceImpl implements AuthService {
                         .map(role -> role.getName().getValue())
                         .collect(Collectors.toList()));
     }
+
 }

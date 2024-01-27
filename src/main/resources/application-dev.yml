@@ -1,0 +1,42 @@
+server:
+  port: 8081
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: user-service
+  sql:
+    init:
+      mode: always
+  datasource:
+    username: user_service
+    password: user_service
+    url: jdbc:postgresql://localhost:5432/user_service
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    protocol: smtps
+    username: uparse.confirmation@yandex.ru
+    password: jcfwyjrsjuobgqth
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+        ssl:
+          enable: true
+        sender:
+          email: uparse.confirmation@yandex.ru
+
+
+jwt:
+  jwtSecret: CzBWQs4W2SoUHFDjVUWPEP3rSUGCO9afPcYh8oYWqk0ht2XN3auyJYYdzcnXV0lq
+  jwtExpirationMs: 7200000
+
+mail-service:
+  activation:
+    uri: http://user-service:8080/api/auth/activation?activationToken={activationToken}
+crypto-util:
+  pepper: Pq12GSnZ5CwkrmutojxQbMl3cRi8speFya760ONUYKgThHAWJIfLdD9V4XEvzB
